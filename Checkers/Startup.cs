@@ -12,6 +12,8 @@ using Checkers.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Checkers.Hubs;
+using Checkers.Models;
 
 namespace Checkers
 {
@@ -30,8 +32,9 @@ namespace Checkers
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddSignalR();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
@@ -57,6 +60,10 @@ namespace Checkers
 
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseSignalR(route =>
+            {
+                route.MapHub<ChatHub>("/Home/Index");
+            });
 
             app.UseEndpoints(endpoints =>
             {
