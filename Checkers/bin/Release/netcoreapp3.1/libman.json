@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "defaultProvider": "filesystem",
+  "libraries": [
+    {
+      "library": "C:\\Users\\Robert\\Downloads\\wwwroot",
+      "destination": "wwwroot/lib/wwwroot/"
+    }
+  ]
+}

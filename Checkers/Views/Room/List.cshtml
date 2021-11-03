@@ -1,0 +1,63 @@
+﻿@model IEnumerable<Checkers.Models.Room>
+
+@{
+    ViewData["Title"] = "List";
+}
+<h1>@ViewData["Title"]</h1>
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>List</title>
+</head>
+<body>
+
+    <form asp-action="Create">
+        <div class="form-group menuItem">
+            <input type="submit" value="Create room" class="btn btn-info" />
+        </div>
+    </form>
+
+    <table class="table table-hover">
+            <tr class="table-info">
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.User1)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.User2)
+                </th>
+                <th>
+
+                </th>
+            </tr>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.User1.UserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.User2.UserName)
+                    </td>
+                    <td>
+                        <form asp-action="Room" asp-route-roomId="@item.Id">
+                            <div class="form-group menuItem">
+                                <input type="submit" value="Enter room" class="btn btn-info" />
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

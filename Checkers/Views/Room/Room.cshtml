@@ -1,0 +1,168 @@
+﻿@model Checkers.Models.Room
+
+@{
+    ViewData["Title"] = "Room";
+}
+<h1>@ViewData["Title"]</h1>
+<div class="divisable">
+    <div class="left-700px">
+        <table class="checkerboard">
+            @for (int y = (ViewBag.currentUserId == Model.User2Id ? 8 : 1); y != (ViewBag.currentUserId == Model.User2Id ? 0 : 9); y = (ViewBag.currentUserId == Model.User2Id ? y-1 : y+1))
+            {
+                <tr>
+                    @for (int x = (ViewBag.currentUserId == Model.User2Id ? 8 : 1); x != (ViewBag.currentUserId == Model.User2Id ? 0 : 9); x = (ViewBag.currentUserId == Model.User2Id ? x - 1 : x + 1))
+                    {
+                        Field field = Model.Board.GetField(x, y);
+                        switch (field.State)
+                        {
+                            case State.Unused:
+                                <td>
+                                    <form asp-action="Room" asp-route-roomId="@Model.Id"
+                                          data-ajax-success="resetSelection" data-ajax="true" data-ajax-method="POST">
+                                        <button class="tile-black"></button>
+                                    </form>
+                                </td>
+                                break;
+                            case State.Black:
+                                <td>
+                                    <form asp-action="Room" asp-route-roomId="@Model.Id"
+                                          data-ajax-success="showAvailable(@x,@y)" data-ajax="true" data-ajax-method="POST">
+                                        <button class="tile-white" name="b" id=@(x.ToString() + y.ToString())>
+                                            <img src="~/images/Black.png" class="checker" />
+                                        </button>
+                                    </form>
+                                </td>
+                                break;
+                            case State.White:
+                                <td>
+                                    <form asp-action="Room" asp-route-roomId="@Model.Id"
+                                          data-ajax-success="showAvailable(@x,@y)" data-ajax="true" data-ajax-method="POST">
+                                        <button class="tile-white" name="w" id=@(x.ToString() + y.ToString())>
+                                            <img src="~/images/White.png" class="checker" />
+                                        </button>
+                                    </form>
+                                </td>
+                                break;
+                            case State.Black_Q:
+                                <td>
+                                    <form asp-action="Room" asp-route-roomId="@Model.Id"
+                                          data-ajax-success="showAvailable(@x,@y)" data-ajax="true" data-ajax-method="POST">
+                                        <button class="tile-white" name="B" id=@(x.ToString() + y.ToString())>
+                                            <img src="~/images/Black Q.png" class="checker" />
+                                        </button>
+                                    </form>
+                                </td>
+                                break;
+                            case State.White_Q:
+                                <td>
+                                    <form asp-action="Room" asp-route-roomId="@Model.Id"
+                                          data-ajax-success="showAvailable(@x,@y)" data-ajax="true" data-ajax-method="POST">
+                                        <button class="tile-white" name="W" id=@(x.ToString() + y.ToString())>
+                                            <img src="~/images/White Q.png" class="checker" />
+                                        </button>
+                                    </form>
+                                </td>
+                                break;
+                            case State.Empty:
+                                <td>
+                                    <form data-ajax-success="showAvailable(@x,@y)" data-ajax="true" data-ajax-method="POST">
+                                        <button class="tile-white" name="e" id=@(x.ToString() + y.ToString())>
+                                        </button>
+                                    </form>
+                                </td>
+                                break;
+                        }
+                    }
+                </tr>
+            }
+        </table>
+    </div>
+    <div class="right60-40">
+        <table class="table playerTable">
+            <tr class="table-info">
+                <td class="playerTableTop">
+                    <img src="~/images/White.png" class="checker-mini" />
+                    @(Model.User1 != null ? Model.User1.UserName : Html.DisplayNameFor(model => model.User1))
+                </td>
+                <td class="playerTableTop">
+                    <img src="~/images/Black.png" class="checker-mini" />
+                    @(Model.User2 != null ? Model.User2.UserName : Html.DisplayNameFor(model => model.User2))
+                </td>
+            </tr>
+            <tr>
+                <td class="playerTableBottom" id="noPadding">
+                    <form data-ajax-success="surrenderButtonPressed()" data-ajax="true" data-ajax-method="POST"
+                          asp-action="JoinButton" asp-route-roomId="@Model.Id" asp-route-buttonId="1" class="playerTableButton">
+                        <button type="submit" class="playerTableButton table-hover" @{ if (ViewBag.currentUserId == null) { @: disabled="disabled"
+                                }}>
+                            @(Model.User1 == null ? "Join" : (Model.User1.Id == ViewBag.currentUserId ? "Leave" : "Occupied"))
+                        </button>
+                    </form>
+                </td>
+                <td class="playerTableBottom" id="noPadding">
+                    <form data-ajax-success="surrenderButtonPressed()" data-ajax="true" data-ajax-method="POST"
+                          asp-action="JoinButton" asp-route-roomId="@Model.Id" asp-route-buttonId="2" class="playerTableButton">
+                        <button type="submit" class="playerTableButton table-hover" @{ if (ViewBag.currentUserId == null) { @: disabled="disabled"
+                                }}>
+                            @(Model.User2 == null ? "Join" : (Model.User2.Id == ViewBag.currentUserId ? "Leave" : "Occupied"))
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td id="no-Border" name="p1Time" value="@Model.User1Time">
+                    @Model.User1Time
+                </td>
+                <td id="no-Border" name="p2Time" value="@Model.User1Time">
+                    @Model.User2Time
+                </td>
+            </tr>
+        </table>
+        <div>
+            @{ if (ViewBag.currentUserId != null && (ViewBag.currentUserId == Model.User1Id || ViewBag.currentUserId == Model.User2Id))
+                    { @:
+                        <form data-ajax-success="surrenderButtonPressed()" data-ajax="true" data-ajax-method="POST">
+                            <div class="form-group menuItem" id="Surr" @{ if (!Model.IsActive) { @: hidden="hidden"
+                                }}>
+                                <input type="submit" value="Surrender" class="btn btn-info" />
+                            </div>
+                        </form>
+                        <form data-ajax-success="startButtonPressed()" data-ajax="true" data-ajax-method="POST"
+                              asp-action="StartButton" asp-route-roomId="@Model.Id">
+                            <div class="form-group menuItem" id="Start" @{ if (Model.IsActive) { @: hidden="hidden"
+                                }}>
+                                <input type="submit" value="Start" class="btn btn-info" />
+                            </div>
+                        </form>
+                    }
+            }
+        </div>
+    </div>
+
+
+
+    @section scripts {
+        <script src="~/signalr/signalr.min.js"></script>
+        <script src="~/lib/jquery/dist/jquery-unobtrusive-ajax.min.js"></script>
+        <script src="~/js/checkers.js"></script>
+        <script src="~/js/signalrReqHandlerRoom.js"></script>
+        <script>
+    connection.start()
+    .then(function () {
+    connection.invoke('joinRoom', '@Model.Id');
+    })
+    .catch(error => {
+    console.error(error.message);
+    });
+
+        function submitMove(move) {
+            connection.invoke('SubmitMove', move,'@Model.Id','@ViewBag.currentUserId');
+            }
+            function startButtonPressed() {
+            connection.invoke('StartGame','@Model.Id');
+            }
+            function surrenderButtonPressed() {
+            connection.invoke('SurrenderGame','@Model.Id','@ViewBag.currentUserId');
+        }
+        </script>
+    }

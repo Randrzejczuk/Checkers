@@ -65,6 +65,11 @@ namespace Checkers
                 route.MapHub<ChatHub>("/Home/Index");
             });
 
+            app.UseSignalR(route =>
+            {
+                route.MapHub<RoomHub>("/RoomHub");
+            });
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

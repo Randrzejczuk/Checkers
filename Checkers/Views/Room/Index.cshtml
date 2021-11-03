@@ -1,0 +1,80 @@
+﻿@model Checkers.Models.Room
+
+@{
+    ViewData["Title"] = "Room";
+}
+<h1>@ViewData["Title"]</h1>
+
+
+
+<table class="checkerboard">
+    @for (int y = 1; y < 9; y++)
+    {
+        <tr>
+            @for (int x = 1; x < 9; x++)
+            {
+                Field field = Model.Board.GetField(x, y);
+                switch (field.State)
+                {
+                    case State.Unused:
+                        <td>
+                            <form data-ajax-success="resetSelection" data-ajax="true" data-ajax-method="POST">
+                                <button class="tile-black"></button>
+                            </form>
+                        </td>
+                        break;
+                    case State.Black:
+                        <td>
+                            <form data-ajax-success="showAvailable(@x,@y)" data-ajax="true" data-ajax-method="POST">
+                                <button class="tile-white" name="b" id=@(x.ToString()+y.ToString())>
+                                    <img src="~/images/Black.png" class="checker" />
+                                </button>
+                            </form>
+                        </td>
+                        break;
+                    case State.White:
+                        <td>
+                            <form data-ajax-success="showAvailable(@x,@y)" data-ajax="true" data-ajax-method="POST">
+                                <button class="tile-white" name="w" id=@(x.ToString()+y.ToString())>
+                                    <img src="~/images/White.png" class="checker" />
+                                </button>
+                            </form>
+                        </td>
+                        break;
+                    case State.Black_Q:
+                        <td>
+                            <form data-ajax-success="showAvailable(@x,@y)" data-ajax="true" data-ajax-method="POST">
+                                <button class="tile-white" name="B" id=@(x.ToString()+y.ToString())>
+                                    <img src="~/images/Black Q.png" class="checker" />
+                                </button>
+                            </form>
+                        </td>
+                        break;
+                    case State.White_Q:
+                        <td>
+                            <form data-ajax-success="showAvailable(@x,@y)" data-ajax="true" data-ajax-method="POST">
+                                <button class="tile-white" name="W" id=@(x.ToString()+y.ToString())>
+                                    <img src="~/images/White Q.png" class="checker" />
+                                </button>
+                            </form>
+                        </td>
+                        break;
+                    case State.Empty:
+                        <td>
+                            <form data-ajax-success="showAvailable(@x,@y)" data-ajax="true" data-ajax-method="POST">
+                                <button class="tile-white" name="e" id=@(x.ToString()+y.ToString())>
+                                </button>
+                            </form>
+                        </td>
+                        break;
+                }
+            }
+        </tr>
+    }
+</table>
+@section scripts {
+    <script src="~/signalr/signalr.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery-unobtrusive-ajax.min.js"></script>
+    <script src="~/js/checkers.js"></script>
+    <script src="~/js/signalrReqHandlerRoom.js"></script>
+}
