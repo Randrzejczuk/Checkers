@@ -1,0 +1,41 @@
+﻿@model Checkers.Models.Room
+
+@{
+    ViewData["Title"] = "Create room";
+}
+<h1>@ViewData["Title"]</h1>
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Create</title>
+</head>
+<body>
+    <hr />
+    <div class="row">
+        <div class="col-md-4 offset-1">
+            <form asp-action="Create room">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group menuItem">
+                    <label asp-for="Name" class="form-label mt-4"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-4 menuItem">
+                    <input type="submit" value="Create" class="btn btn-primary buttonItem" />
+                </div>
+            </form>
+            <form asp-action="List">
+                <div class="form-group menuItem">
+                    <input type="submit" value="Cancel" class="btn btn-secondary buttonItem" />
+                </div>
+            </form>
+        </div>
+    </div>
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
+</body>
+</html>

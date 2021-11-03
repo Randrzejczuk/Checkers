@@ -19,6 +19,49 @@ namespace Checkers.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("Checkers.Models.BoardState", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("LastMovedId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LastMovedId");
+
+                    b.ToTable("BoardStates");
+                });
+
+            modelBuilder.Entity("Checkers.Models.Field", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("BoardStateId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Y")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BoardStateId");
+
+                    b.ToTable("Field");
+                });
+
             modelBuilder.Entity("Checkers.Models.Message", b =>
                 {
                     b.Property<int>("Id")
@@ -45,6 +88,55 @@ namespace Checkers.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("Checkers.Models.Room", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("ActiveUser")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("BoardId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("User1Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("User1IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeSpan>("User1Time")
+                        .HasColumnType("time");
+
+                    b.Property<string>("User2Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("User2IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeSpan>("User2Time")
+                        .HasColumnType("time");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BoardId");
+
+                    b.HasIndex("User1Id");
+
+                    b.HasIndex("User2Id");
+
+                    b.ToTable("Rooms");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -260,11 +352,40 @@ namespace Checkers.Data.Migrations
                     b.HasDiscriminator().HasValue("User");
                 });
 
+            modelBuilder.Entity("Checkers.Models.BoardState", b =>
+                {
+                    b.HasOne("Checkers.Models.Field", "LastMoved")
+                        .WithMany()
+                        .HasForeignKey("LastMovedId");
+                });
+
+            modelBuilder.Entity("Checkers.Models.Field", b =>
+                {
+                    b.HasOne("Checkers.Models.BoardState", null)
+                        .WithMany("Fields")
+                        .HasForeignKey("BoardStateId");
+                });
+
             modelBuilder.Entity("Checkers.Models.Message", b =>
                 {
                     b.HasOne("Checkers.Models.User", "User")
                         .WithMany("Messages")
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Checkers.Models.Room", b =>
+                {
+                    b.HasOne("Checkers.Models.BoardState", "Board")
+                        .WithMany()
+                        .HasForeignKey("BoardId");
+
+                    b.HasOne("Checkers.Models.User", "User1")
+                        .WithMany()
+                        .HasForeignKey("User1Id");
+
+                    b.HasOne("Checkers.Models.User", "User2")
+                        .WithMany()
+                        .HasForeignKey("User2Id");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
