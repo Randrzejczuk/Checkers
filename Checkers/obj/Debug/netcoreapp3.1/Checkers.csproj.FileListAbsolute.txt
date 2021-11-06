@@ -64,7 +64,6 @@ C:\Users\Robert\Documents\GitHub\Checkers\Checkers\obj\Debug\netcoreapp3.1\Check
 C:\Users\Robert\Documents\GitHub\Checkers\Checkers\obj\Debug\netcoreapp3.1\Checkers.RazorCoreGenerate.cache
 C:\Users\Robert\Documents\GitHub\Checkers\Checkers\obj\Debug\netcoreapp3.1\Razor\Areas\Identity\Pages\_ViewStart.cshtml.g.cs
 C:\Users\Robert\Documents\GitHub\Checkers\Checkers\obj\Debug\netcoreapp3.1\Razor\Views\Home\Index.cshtml.g.cs
-C:\Users\Robert\Documents\GitHub\Checkers\Checkers\obj\Debug\netcoreapp3.1\Razor\Views\Home\Privacy.cshtml.g.cs
 C:\Users\Robert\Documents\GitHub\Checkers\Checkers\obj\Debug\netcoreapp3.1\Razor\Views\Shared\Error.cshtml.g.cs
 C:\Users\Robert\Documents\GitHub\Checkers\Checkers\obj\Debug\netcoreapp3.1\Razor\Views\Shared\_Layout.cshtml.g.cs
 C:\Users\Robert\Documents\GitHub\Checkers\Checkers\obj\Debug\netcoreapp3.1\Razor\Views\Shared\_LoginPartial.cshtml.g.cs
@@ -153,7 +152,6 @@ C:\Users\Robert\Documents\GitHub\Checkers\Checkers\bin\Debug\netcoreapp3.1\ru\Mi
 C:\Users\Robert\Documents\GitHub\Checkers\Checkers\bin\Debug\netcoreapp3.1\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\Robert\Documents\GitHub\Checkers\Checkers\bin\Debug\netcoreapp3.1\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\Robert\Documents\GitHub\Checkers\Checkers\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
-C:\Users\Robert\Documents\GitHub\Checkers\Checkers\obj\Debug\netcoreapp3.1\Razor\Views\Room\Index.cshtml.g.cs
 C:\Users\Robert\Documents\GitHub\Checkers\Checkers\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Connections.Abstractions.dll
 C:\Users\Robert\Documents\GitHub\Checkers\Checkers\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Http.Features.dll
 C:\Users\Robert\Documents\GitHub\Checkers\Checkers\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.SignalR.Client.Core.dll

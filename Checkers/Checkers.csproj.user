@@ -16,7 +16,7 @@
     <NameOfLastUsedPublishProfile>IISProfile</NameOfLastUsedPublishProfile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Update="Timers\CustomTimer.cs">
+    <Compile Update="Models\CustomTimer.cs">
       <SubType>Component</SubType>
     </Compile>
   </ItemGroup>
