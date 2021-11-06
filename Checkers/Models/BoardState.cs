@@ -94,7 +94,7 @@ namespace Checkers.Models
         }
         public string ValidateMove(Move move)
         {
-            Field attacker = GetField(move.startX, move.startY);
+            Field attacker = GetField(move.StartX, move.StartY);
             if (LastMoved != null && attacker.GetColor() == LastMoved.GetColor())
             {
                 if (attacker != LastMoved)
@@ -104,15 +104,15 @@ namespace Checkers.Models
             attacks = Fields.Where(f => f.GetColor() == attacker.GetColor());
             attacks = attacks.Where(f => f.CanAttack(this) == true);
             if (!attacks.Any())
-                move.isvalid = true;
-            else if (attacks.Any(f=>f.X == move.startX && f.Y == move.startY) && Math.Abs(move.startX - move.targetX) == 2)
-                move.isvalid = true;
-            if (move.isvalid)
+                move.Isvalid = true;
+            else if (attacks.Any(f=>f.X == move.StartX && f.Y == move.StartY) && Math.Abs(move.StartX - move.TargetX) == 2)
+                move.Isvalid = true;
+            if (move.Isvalid)
             {
-                if (Math.Abs(move.startX - move.targetX) == 2)
+                if (Math.Abs(move.StartX - move.TargetX) == 2)
                 {
-                    move.destroyX = (move.startX + move.targetX) / 2;
-                    move.destroyY = (move.startY + move.targetY) / 2;
+                    move.DestroyX = (move.StartX + move.TargetX) / 2;
+                    move.DestroyY = (move.StartY + move.TargetY) / 2;
                 }
                 RecordMovement(move);
                 return "";
@@ -121,16 +121,16 @@ namespace Checkers.Models
         }
         private void RecordMovement(Move move)
         {
-            Field start = GetField(move.startX, move.startY);
-            Field target = GetField(move.targetX, move.targetY);
+            Field start = GetField(move.StartX, move.StartY);
+            Field target = GetField(move.TargetX, move.TargetY);
             target.State = start.State;
             start.State = State.Empty;
             if ((target.Y == 8 && target.State == State.Black)|| (target.Y == 1 && target.State == State.White))
                 target.Promote();
 
-            if (move.destroyX != null)
+            if (move.DestroyX != null)
             {
-                Field destroy = GetField((int)move.destroyX, (int)move.destroyY);
+                Field destroy = GetField((int)move.DestroyX, (int)move.DestroyY);
                 destroy.State = State.Empty;
             }
             LastMoved = target;

@@ -1,14 +1,11 @@
 ﻿var connection = new signalR.HubConnectionBuilder()
-    .withUrl('/Home/Index')
+    .withUrl('/ChatHub')
     .build();
 
-connection.on('receiveMessage', addMessageToChat);
+connection.on('receiveMessage', receiveMessage);
 
 connection.start()
     .catch(error => {
         console.error(error.message);
     });
 
-function sendMessageToHub(message) {
-    connection.invoke('endMessage', message);
-}

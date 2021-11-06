@@ -27,9 +27,10 @@ namespace Checkers.Models
         public bool ActiveUser { get; set; }
         public bool IsActive { get; set; }
 
+
         public string ValidatePlayer(string userId, Move move)
         {
-            Field field = Board.GetField(move.startX, move.startY);
+            Field field = Board.GetField(move.StartX, move.StartY);
             if (userId != User1Id && userId != User2Id)
                 return "You are not a player in this game.";
             else if (!IsActive)

@@ -1,4 +1,5 @@
-﻿using Checkers.Models;
+﻿using Checkers.Data;
+using Checkers.Models;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,22 @@ namespace Checkers.Hubs
 {
     public class ChatHub : Hub
     {
-        public async Task SendMessage(Message message) =>
+        public readonly ApplicationDbContext _context;
+        public CustomTimer aTimer = new CustomTimer(1000);
+        public ChatHub(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+        public async Task SendMessage(string UserId)
+        {
+          string message = _context.Messages
+                .Where(m => m.UserId == UserId)
+                .OrderByDescending(m=>m.Posted)
+                .FirstOrDefault()
+                .MessageToDisplay();
             await Clients.All.SendAsync("receiveMessage", message);
+        }
     }
+
+
 }

@@ -13,5 +13,9 @@ namespace Checkers.Models
             Messages = new HashSet<Message>();
         }
         public ICollection<Message> Messages { get; set; }
+        public string ShortName()
+        {
+            return this.UserName.Split('@')[0];
+        }
     }
 }

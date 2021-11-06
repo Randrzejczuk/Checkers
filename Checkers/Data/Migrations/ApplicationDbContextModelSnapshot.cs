@@ -69,6 +69,10 @@ namespace Checkers.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("Posted")
                         .HasColumnType("datetime2");
 
@@ -88,6 +92,8 @@ namespace Checkers.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Messages");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Message");
                 });
 
             modelBuilder.Entity("Checkers.Models.Room", b =>
@@ -345,6 +351,18 @@ namespace Checkers.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("Checkers.Models.RoomMessage", b =>
+                {
+                    b.HasBaseType("Checkers.Models.Message");
+
+                    b.Property<int?>("roomId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("roomId");
+
+                    b.HasDiscriminator().HasValue("RoomMessage");
+                });
+
             modelBuilder.Entity("Checkers.Models.User", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
@@ -437,6 +455,13 @@ namespace Checkers.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Checkers.Models.RoomMessage", b =>
+                {
+                    b.HasOne("Checkers.Models.Room", "room")
+                        .WithMany("RoomMessages")
+                        .HasForeignKey("roomId");
                 });
 #pragma warning restore 612, 618
         }

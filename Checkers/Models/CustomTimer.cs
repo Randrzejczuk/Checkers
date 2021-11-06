@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Checkers.Timers
+namespace Checkers.Models
 {
     public class CustomTimer : Timer
     {
@@ -16,8 +16,8 @@ namespace Checkers.Timers
         {
         }
         public Room room;
-        public HubCallerContext callerContext { get; set; }
-        public IHubCallerClients<IClientProxy> hubCallerClients { get; set; }
-        public ApplicationDbContext context { get; set; }
+        public HubCallerContext CallerContext { get; set; }
+        public IHubCallerClients<IClientProxy> HubCallerClients { get; set; }
+        public ApplicationDbContext Context { get; set; }
     }
 }
