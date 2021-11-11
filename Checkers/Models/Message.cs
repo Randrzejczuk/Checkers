@@ -15,10 +15,6 @@ namespace Checkers.Models
         public string Text { get; set; }
         public DateTime Posted { get; set; }
         public string UserId { get; set; }
-        public User User { get; set; } 
-        public string MessageToDisplay()
-        {
-            return $"[{Posted.ToShortTimeString()}] {UserName.Split('@')[0]}: {Text}";
-        }
+        public User User { get; set; }
     }
 }

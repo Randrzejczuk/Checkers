@@ -1,13 +1,18 @@
-﻿using Checkers.Data;
-using Checkers.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Checkers.Models;
+using Microsoft.AspNetCore.Mvc;
+
+using Checkers.Tempclasses;
+using Checkers.Data;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Checkers.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using System.Diagnostics;
 
 namespace Checkers.Controllers
 {
@@ -23,7 +28,7 @@ namespace Checkers.Controllers
             _context = context;
             _userManager = userManager;
         }
-        public Room GetRoom(int roomId)
+        public  Room GetRoom(int roomId)
         {
             Room room = _context.Rooms
                 .Where(r => r.Id == roomId)
@@ -37,7 +42,18 @@ namespace Checkers.Controllers
             else
                 throw new Exception($"Room whith Id {roomId} does not exist.");
         }
-        [Authorize]
+        
+        public IActionResult Index()
+        {
+            if (Tempclass.room == null)
+            {
+                Tempclass.room = new Room()
+                {
+                    Board = new BoardState()
+                };
+            }
+            return View(Tempclass.room);
+        }
         public IActionResult List()
         {
             var result = _context.Rooms
@@ -47,15 +63,13 @@ namespace Checkers.Controllers
         }
         [ActionName("Create")]
         [ValidateAntiForgeryToken]
-        [Authorize]
-
+        
         public IActionResult Create()
         {
             return View();
         }
         [ActionName("Create room")]
         [ValidateAntiForgeryToken]
-        [Authorize]
         public async Task<IActionResult> CreateAsync(Room room)
         {
             if (ModelState.IsValid)
@@ -74,14 +88,12 @@ namespace Checkers.Controllers
                 _context.Add(room);
                 _context.SaveChanges();
             }
-            return RedirectToAction("Room", new { roomId = room.Id });
+                return RedirectToAction("Room",new { roomId = room.Id });
         }
-        [Authorize]
         public IActionResult Room(int roomId)
         {
             try
             {
-
                 Room room = GetRoom(roomId);
                 var userId = _userManager.GetUserId(User);
                 ViewBag.currentUserId = userId;
@@ -131,56 +143,56 @@ namespace Checkers.Controllers
         {
             try
             {
-                Room room = GetRoom(roomId);
-                var user = await _userManager.GetUserAsync(User);
-                if (buttonId == 1)
+            Room room = GetRoom(roomId);
+            var user = await _userManager.GetUserAsync(User);
+            if (buttonId == 1)
+            {
+                if (room.User1 == null)
                 {
-                    if (room.User1 == null)
-                    {
-                        room.User1 = user;
-                        room.User1Id = user.Id;
-                        if (room.User2Id == user.Id)
-                        {
-                            room.User2 = null;
-                            room.User2Id = null;
-                            room.User2IsActive = false;
-                        }
-                    }
-                    else if (room.User1.Id == user.Id)
-                    {
-                        room.User1 = null;
-                        room.User1Id = null;
-                        room.User1IsActive = false;
-                        if (room.User2 == null)
-                        {
-                            _context.Rooms.Remove(room);
-                            _context.SaveChanges();
-                            return RedirectToAction("List");
-                        }
-                    }
-                }
-                else
-                {
-                    if (room.User2 == null)
-                    {
-                        room.User2 = user;
-                        room.User2Id = user.Id;
-                        if (room.User1Id == user.Id)
-                        {
-                            room.User1 = null;
-                            room.User1Id = null;
-                            room.User1IsActive = false;
-                        }
-                    }
-                    else if (room.User2.Id == user.Id)
+                    room.User1 = user;
+                    room.User1Id = user.Id;
+                    if (room.User2Id == user.Id)
                     {
                         room.User2 = null;
                         room.User2Id = null;
                         room.User2IsActive = false;
-                        if (room.User1 == null)
-                        {
-                            _context.Rooms.Remove(room);
-                            _context.SaveChanges();
+                    }
+                }
+                else if (room.User1.Id == user.Id)
+                {
+                    room.User1 = null;
+                    room.User1Id = null;
+                    room.User1IsActive = false;
+                    if (room.User2 == null)
+                    {
+                        _context.Rooms.Remove(room);
+                        _context.SaveChanges();
+                        return RedirectToAction("List");
+                    }
+                }
+            }
+            else
+            {
+                if (room.User2 == null)
+                {
+                    room.User2 = user;
+                    room.User2Id = user.Id;
+                    if (room.User1Id == user.Id)
+                    {
+                        room.User1 = null;
+                        room.User1Id = null;
+                        room.User1IsActive = false;
+                    }
+                }
+                else if (room.User2.Id == user.Id)
+                {
+                    room.User2 = null;
+                    room.User2Id = null;
+                    room.User2IsActive = false;
+                    if(room.User1== null)
+                    {
+                        _context.Rooms.Remove(room);
+                        _context.SaveChanges();
                             return RedirectToAction("List");
                         }
                     }

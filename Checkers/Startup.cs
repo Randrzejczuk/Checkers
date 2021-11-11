@@ -62,7 +62,7 @@ namespace Checkers
             app.UseAuthorization();
             app.UseSignalR(route =>
             {
-                route.MapHub<ChatHub>("/ChatHub");
+                route.MapHub<ChatHub>("/Home/Index");
             });
 
             app.UseSignalR(route =>

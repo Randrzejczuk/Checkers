@@ -5,8 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using System.Threading.Tasks;
+
+using Checkers.Tempclasses;
 using Checkers.Data;
 using Microsoft.EntityFrameworkCore;
+using Checkers.Timers;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -37,11 +40,11 @@ namespace Checkers.Hubs
             string errorMessage = room.ValidatePlayer(userId, move);
             if (errorMessage == "")
                 errorMessage = room.Board.ValidateMove(move);
-            if (move.Isvalid)
+            if (move.isvalid)
             {
-                if (Math.Abs(move.TargetX - move.StartX) == 2)
+                if (Math.Abs(move.targetX - move.startX) == 2)
                 {
-                    Field field = room.Board.GetField(move.TargetX, move.TargetY);
+                    Field field = room.Board.GetField(move.targetX, move.targetY);
                     if (!field.CanAttack(room.Board))
                         room.ActiveUser = !room.ActiveUser;
                 }
@@ -82,11 +85,9 @@ namespace Checkers.Hubs
         }
         public async Task SurrenderGame(string roomId, string userId)
         {
-
-            Move move = new Move
-            {
-                Isvalid = false
-            };
+            
+            Move move = new Move();
+            move.isvalid = false;
             Room room = _context.Rooms
                 .Where(r => r.Id.ToString() == roomId)
                 .FirstOrDefault();
@@ -96,13 +97,13 @@ namespace Checkers.Hubs
                 {
                     room.IsActive = false;
                     _context.SaveChanges();
-                    await Clients.Group(roomId).SendAsync("gameOver", "White player surrendered, Black player wins!",room.User1Id);
+                    await Clients.Group(roomId).SendAsync("gameOver", "White player surrendered, Black player wins!");
                 }
                 else
                 {
                     room.IsActive = false;
                     _context.SaveChanges();
-                    await Clients.Group(roomId).SendAsync("gameOver", "Black player surrendered, White player wins!",room.User1Id);
+                    await Clients.Group(roomId).SendAsync("gameOver", "Black player surrendered, White player wins!");
                 }
             }
             else
@@ -114,8 +115,8 @@ namespace Checkers.Hubs
         private void SetTimer(Room room)
         {
             aTimer.room = room;
-            aTimer.CallerContext = Context;
-            aTimer.HubCallerClients = Clients;
+            aTimer.callerContext = Context;
+            aTimer.hubCallerClients = Clients;
             aTimer.Elapsed += OnTimedEvent;
             aTimer.Interval = 1000;
             aTimer.Enabled = true;
@@ -123,41 +124,43 @@ namespace Checkers.Hubs
         private async void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
             aTimer = (CustomTimer)source;
-            HubCallerContext hcallerContext = aTimer.CallerContext;
-            IHubCallerClients<IClientProxy> hubClients = aTimer.HubCallerClients;
+            HubCallerContext hcallerContext = aTimer.callerContext;
+            IHubCallerClients<IClientProxy> hubClients = aTimer.hubCallerClients;
 
-            using var scope = _serviceScopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetService<ApplicationDbContext>();
-            Room room = dbContext.Rooms.Where(r => r.Id == aTimer.room.Id).FirstOrDefault();
-            if (room != null && room.IsActive)
+            using (var scope = _serviceScopeFactory.CreateScope())
             {
-                if (!room.ActiveUser)
-                    room.User1Time -= TimeSpan.FromSeconds(1);
-                else
-                    room.User2Time -= TimeSpan.FromSeconds(1);
+                var dbContext = scope.ServiceProvider.GetService<ApplicationDbContext>();
+                Room room = dbContext.Rooms.Where(r => r.Id == aTimer.room.Id).FirstOrDefault();
+                if (room!= null && room.IsActive)
+                {
+                    if (!room.ActiveUser)
+                        room.User1Time -= TimeSpan.FromSeconds(1);
+                    else
+                        room.User2Time -= TimeSpan.FromSeconds(1);
 
-                if (room.User1Time <= TimeSpan.Zero)
-                {
-                    aTimer.Enabled = false;
-                    room.IsActive = false;
-                    dbContext.SaveChanges();
-                    await hubClients.Group(room.Id.ToString()).SendAsync("gameOver", "White player ran out of time, Black player wins!");
-                }
-                else if (room.User2Time <= TimeSpan.Zero)
-                {
-                    aTimer.Enabled = false;
-                    room.IsActive = false;
-                    dbContext.SaveChanges();
-                    await hubClients.Group(room.Id.ToString()).SendAsync("gameOver", "Black player ran out of time, White player wins!");
+                    if (room.User1Time <= TimeSpan.Zero)
+                    {
+                        aTimer.Enabled = false;
+                        room.IsActive = false;
+                        dbContext.SaveChanges();
+                        await hubClients.Group(room.Id.ToString()).SendAsync("gameOver", "White player ran out of time, Black player wins!");
+                    }
+                    else if (room.User2Time <= TimeSpan.Zero)
+                    {
+                        aTimer.Enabled = false;
+                        room.IsActive = false;
+                        dbContext.SaveChanges();
+                        await hubClients.Group(room.Id.ToString()).SendAsync("gameOver", "Black player ran out of time, White player wins!");
+                    }
+                    else
+                    {
+                        dbContext.SaveChanges();
+                        await hubClients.Group(room.Id.ToString()).SendAsync("updateTime", room.User1Time.ToString(), room.User2Time.ToString());
+                    }
                 }
                 else
-                {
-                    dbContext.SaveChanges();
-                    await hubClients.Group(room.Id.ToString()).SendAsync("updateTime", room.User1Time.ToString(), room.User2Time.ToString());
-                }
+                    aTimer.Enabled = false;
             }
-            else
-                aTimer.Enabled = false;
         }
     }
 

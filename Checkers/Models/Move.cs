@@ -7,12 +7,12 @@ namespace Checkers.Models
 {
     public class Move
     {
-        public int StartX { get; set; }
-        public int StartY { get; set; }
-        public int TargetX { get; set; }
-        public int TargetY { get; set; }
-        public bool Isvalid { get; set; }
-        public int? DestroyX { get; set; }
-        public int? DestroyY { get; set; }
+        public int startX { get; set; }
+        public int startY { get; set; }
+        public int targetX { get; set; }
+        public int targetY { get; set; }
+        public bool isvalid { get; set; }
+        public int? destroyX { get; set; }
+        public int? destroyY { get; set; }
     }
 }

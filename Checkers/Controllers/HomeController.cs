@@ -28,22 +28,16 @@ namespace Checkers.Controllers
             _context = context;
             _userManager = userManager;
         }
-        [Authorize]
+
         public async Task<IActionResult> Index()
         {
-            var userId = _userManager.GetUserId(User);
-            ViewBag.currentUserId = userId;
             var currentUser = await _userManager.GetUserAsync(User);
-            ViewBag.currentUserId = userId;
             if (User.Identity.IsAuthenticated)
                 ViewBag.CurrentUserName = currentUser.UserName;
-            List<Message> allmessages = await _context.Messages
-                .OrderBy(m => m.Posted)
-                .ToListAsync();
-            IEnumerable<Message> messages = allmessages.TakeLast(20);
-            return View(messages);
+            var messages = await _context.Messages.ToListAsync();
+            return View();
         }
-        [Authorize]
+
         public async Task<IActionResult> Create(Message message)
         {
             if(ModelState.IsValid)
@@ -57,6 +51,11 @@ namespace Checkers.Controllers
                 return Ok();
             }
             return Error();
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

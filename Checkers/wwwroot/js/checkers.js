@@ -132,12 +132,12 @@ function updateTime(time1, time2) {
     timer2.innerHTML = time2;
 }
 //Displays alert message and changes start/surrender buttons
-function gameOver(message,userId) {
+function gameOver(message) {
     alert(message);
     startButton = document.getElementById("Start");
     surrButton = document.getElementById("Surr");
     startButton.hidden = false;
     surrButton.hidden = true;
-    if (userId == null)
-        refresh();
+    //startButton.setAttribute("hidden", "");
+    //surrButton.setAttribute("hidden", "hidden");
 }

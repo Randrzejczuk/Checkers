@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Room";
 }
-<h1>@Model.Name</h1>
+<h1>@ViewData["Title"]</h1>
 <div class="divisable">
     <div class="left-700px">
         <table class="checkerboard">
@@ -82,11 +82,11 @@
             <tr class="table-info">
                 <td class="playerTableTop">
                     <img src="~/images/White.png" class="checker-mini" />
-                    @(Model.User1 != null ? Model.User1.ShortName() : Html.DisplayNameFor(model => model.User1))
+                    @(Model.User1 != null ? Model.User1.UserName : Html.DisplayNameFor(model => model.User1))
                 </td>
                 <td class="playerTableTop">
                     <img src="~/images/Black.png" class="checker-mini" />
-                    @(Model.User2 != null ? Model.User2.ShortName() : Html.DisplayNameFor(model => model.User2))
+                    @(Model.User2 != null ? Model.User2.UserName : Html.DisplayNameFor(model => model.User2))
                 </td>
             </tr>
             <tr>
@@ -120,25 +120,24 @@
         </table>
         <div>
             @{ if (ViewBag.currentUserId != null && (ViewBag.currentUserId == Model.User1Id || ViewBag.currentUserId == Model.User2Id))
-                { @:
-                    <form data-ajax-success="surrenderButtonPressed()" data-ajax="true" data-ajax-method="POST">
-                        <div class="form-group menuItem" id="Surr" @{ if (!Model.IsActive) { @: hidden="hidden"
-                             }}>
-                            <input type="submit" value="Surrender" class="btn btn-info" />
-                        </div>
-                    </form>
-                    <form data-ajax-success="startButtonPressed()" data-ajax="true" data-ajax-method="POST"
-                          asp-action="StartButton" asp-route-roomId="@Model.Id">
-                        <div class="form-group menuItem" id="Start" @{ if (Model.IsActive) { @: hidden="hidden"
-                             }}>
-                            <input type="submit" value="Start" class="btn btn-info" />
-                        </div>
-                    </form>
-                }
+                    { @:
+                        <form data-ajax-success="surrenderButtonPressed()" data-ajax="true" data-ajax-method="POST">
+                            <div class="form-group menuItem" id="Surr" @{ if (!Model.IsActive) { @: hidden="hidden"
+                                }}>
+                                <input type="submit" value="Surrender" class="btn btn-info" />
+                            </div>
+                        </form>
+                        <form data-ajax-success="startButtonPressed()" data-ajax="true" data-ajax-method="POST"
+                              asp-action="StartButton" asp-route-roomId="@Model.Id">
+                            <div class="form-group menuItem" id="Start" @{ if (Model.IsActive) { @: hidden="hidden"
+                                }}>
+                                <input type="submit" value="Start" class="btn btn-info" />
+                            </div>
+                        </form>
+                    }
             }
         </div>
     </div>
-</div>
 
 
 
