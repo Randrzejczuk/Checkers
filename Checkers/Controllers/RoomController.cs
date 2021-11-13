@@ -89,9 +89,8 @@ namespace Checkers.Controllers
                 ViewBag.currentUserId = userId;
                 return View(room);
             }
-            catch (Exception ex)
+            catch
             {
-                string a = ex.Message;
                 return RedirectToAction("List");
             }
         }
@@ -130,6 +129,30 @@ namespace Checkers.Controllers
                 return RedirectToAction("List");
             }
         }
+        public async Task<IActionResult> PlayWithBot(int roomId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            Room room = GetRoom(roomId);
+            User Bot = GetOrCreateBot();
+
+            if (user.Id == room.User1Id)
+            {
+                room.User2 = Bot;
+                _context.SaveChanges();
+            }
+            else if (user.Id == room.User2Id)
+            {
+                room.User1 = Bot;
+                _context.SaveChanges();
+            }
+            room.User1Time = TimeSpan.FromMinutes(5);
+            room.User2Time = TimeSpan.FromMinutes(5);
+            room.ActiveUser = false;
+            room.IsActive = true;
+            room.Board.Init();
+            _context.SaveChanges();
+            return RedirectToAction("Room", new { roomId });
+        }
         public async Task<IActionResult> JoinButton(int roomId, int buttonId)
         {
             try
@@ -154,7 +177,7 @@ namespace Checkers.Controllers
                         room.User1 = null;
                         room.User1Id = null;
                         room.User1IsActive = false;
-                        if (room.User2 == null)
+                        if (room.User2 == null || room.User2.UserName == "BOT")
                         {
                             _context.Messages.RemoveRange(room.Messages);
                             _context.Rooms.Remove(room);
@@ -181,7 +204,7 @@ namespace Checkers.Controllers
                         room.User2 = null;
                         room.User2Id = null;
                         room.User2IsActive = false;
-                        if (room.User1 == null)
+                        if (room.User1 == null || room.User1.UserName=="BOT")
                         {
                             _context.Rooms.Remove(room);
                             _context.SaveChanges();
@@ -211,6 +234,19 @@ namespace Checkers.Controllers
                 await _context.Messages.AddAsync(message);
                 await _context.SaveChangesAsync();
                 return Ok();
+        }
+        private User GetOrCreateBot()
+        {
+            User Bot = (User)_context.Users.Where(u => u.UserName == "BOT").FirstOrDefault();
+            if(Bot==null)
+            {
+                Bot = new User() {
+                    UserName = "BOT"
+                };
+                _context.Users.Add(Bot);
+                _context.SaveChangesAsync();
+            }
+            return Bot;
         }
     }
 }

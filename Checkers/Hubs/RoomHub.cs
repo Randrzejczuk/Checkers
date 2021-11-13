@@ -32,6 +32,8 @@ namespace Checkers.Hubs
                 .Where(r => r.Id.ToString() == roomId)
                 .Include(r => r.Board)
                 .Include(r => r.Board.Fields)
+                .Include(r => r.User1)
+                .Include(r => r.User2)
                 .FirstOrDefault();
 
             string errorMessage = room.ValidatePlayer(userId, move);
@@ -65,6 +67,8 @@ namespace Checkers.Hubs
                         await Clients.Group(roomId).SendAsync("realizeMovement", move, "White player wins!");
                         break;
                 }
+                if ((!room.ActiveUser && room.User1.UserName == "BOT") || (room.ActiveUser && room.User2.UserName == "BOT"))
+                    await BotMovement(roomId);
             }
             else
                 await Clients.Caller.SendAsync("realizeMovement", move, errorMessage);
@@ -73,36 +77,54 @@ namespace Checkers.Hubs
         {
             Room room = _context.Rooms
                 .Where(r => r.Id.ToString() == roomId)
+                .Include(r=>r.User1)
+                .Include(r => r.User2)
                 .FirstOrDefault();
             if (room.IsActive)
             {
                 SetTimer(room);
                 await Clients.Group(roomId).SendAsync("refresh");
             }
+            if (room.User1.UserName == "BOT")
+                await BotMovement(roomId);
         }
         public async Task SurrenderGame(string roomId, string userId)
         {
-
-            Move move = new Move
-            {
-                Isvalid = false
-            };
             Room room = _context.Rooms
                 .Where(r => r.Id.ToString() == roomId)
+                .Include(r=>r.User1)
+                .Include(r => r.User2)
                 .FirstOrDefault();
-            if (room!=null && room.IsActive)
+            if (room != null)
             {
-                if (userId == room.User1Id || room.User1Id == null)
+                if (room.User1 != null && room.User1.UserName == "BOT")
                 {
-                    room.IsActive = false;
-                    _context.SaveChanges();
-                    await Clients.Group(roomId).SendAsync("gameOver", "White player surrendered, Black player wins!",room.User1Id);
+                    room.User1 = null;
+                }
+                else if (room.User2 != null && room.User2.UserName == "BOT")
+                {
+                    room.User2 = null;
+                }
+                _context.SaveChanges();
+
+                if (room.IsActive)
+                {
+                    if (userId == room.User1Id || room.User1Id == null)
+                    {
+                        room.IsActive = false;
+                        _context.SaveChanges();
+                        await Clients.Group(roomId).SendAsync("gameOver", "White player surrendered, Black player wins!", room.User1Id);
+                    }
+                    else
+                    {
+                        room.IsActive = false;
+                        _context.SaveChanges();
+                        await Clients.Group(roomId).SendAsync("gameOver", "Black player surrendered, White player wins!", room.User1Id);
+                    }
                 }
                 else
                 {
-                    room.IsActive = false;
-                    _context.SaveChanges();
-                    await Clients.Group(roomId).SendAsync("gameOver", "Black player surrendered, White player wins!",room.User1Id);
+                    await Clients.Group(roomId).SendAsync("refresh");
                 }
             }
             else
@@ -110,7 +132,6 @@ namespace Checkers.Hubs
                 await Clients.Group(roomId).SendAsync("refresh");
             }
         }
-    
         private void SetTimer(Room room)
         {
             aTimer.room = room;
@@ -168,6 +189,26 @@ namespace Checkers.Hubs
                   .MessageToDisplay();
             await Clients.Group(roomId.ToString()).SendAsync("receiveMessage", message);
         }
-    }
+        private async Task BotMovement(string roomId)
+        {
+            Room room = _context.Rooms
+                .Where(r => r.Id.ToString() == roomId)
+                .Include(r => r.User1)
+                .Include(r => r.User2)
+                .FirstOrDefault();
+            string botId = room.User1.UserName == "BOT" ? room.User1Id : room.User2Id;
+            Color botColor = room.ActiveUser ? Color.Black : Color.White;
 
+            List<Move> AvailableMoves = room.Board.GetAvailableMoves(botColor);
+            if (AvailableMoves.Any())
+            {
+                //TO DO: Nadać Jakiś sens ruchom bota
+                await SubmitMove(AvailableMoves.FirstOrDefault(),roomId,botId);
+            }
+            else
+            {
+               await SurrenderGame(roomId, botId);
+            }
+        }
+    }
 }

@@ -94,7 +94,7 @@
                 <td class="playerTableBottom" id="noPadding">
                     <form data-ajax-success="surrenderButtonPressed('@Model.Id','@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST"
                           asp-action="JoinButton" asp-route-roomId="@Model.Id" asp-route-buttonId="1" class="playerTableButton">
-                        <button type="submit" class="playerTableButton table-hover" @{ if (ViewBag.currentUserId == null) { @: disabled="disabled"
+                        <button type="submit" class="playerTableButton table-hover" @{ if (ViewBag.currentUserId == null || (Model.User1Id != ViewBag.currentUserId && Model.User1Id != null)) { @: disabled="disabled"
                                 }}>
                             @(Model.User1 == null ? "Join" : (Model.User1.Id == ViewBag.currentUserId ? "Leave" : "Occupied"))
                         </button>
@@ -103,7 +103,7 @@
                 <td class="playerTableBottom" id="noPadding">
                     <form data-ajax-success="surrenderButtonPressed('@Model.Id','@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST"
                           asp-action="JoinButton" asp-route-roomId="@Model.Id" asp-route-buttonId="2" class="playerTableButton">
-                        <button type="submit" class="playerTableButton table-hover" @{ if (ViewBag.currentUserId == null) { @: disabled="disabled"
+                        <button type="submit" class="playerTableButton table-hover" @{ if (ViewBag.currentUserId == null || (Model.User2Id != ViewBag.currentUserId && Model.User2Id != null)) { @: disabled="disabled"
                                 }}>
                             @(Model.User2 == null ? "Join" : (Model.User2.Id == ViewBag.currentUserId ? "Leave" : "Occupied"))
                         </button>
@@ -130,9 +130,16 @@
                     </form>
                     <form data-ajax-success="startButtonPressed('@Model.Id')" data-ajax="true" data-ajax-method="POST"
                           asp-action="StartButton" asp-route-roomId="@Model.Id">
-                        <div class="form-group menuItem" id="Start" @{ if (Model.IsActive) { @: hidden="hidden"
+                        <div class="form-group menuItem" id="Start" @{ if (Model.IsActive || Model.User1Id == null || Model.User2Id == null) { @: hidden="hidden"
                              }}>
                             <input type="submit" value="Start" class="btn btn-info" />
+                        </div>
+                    </form>
+                    <form data-ajax-success="startButtonPressed('@Model.Id')" data-ajax="true" data-ajax-method="POST"
+                          asp-action="PlayWithBot" asp-route-roomId="@Model.Id">
+                        <div class="form-group menuItem" id="Start" @{ if (Model.IsActive || (Model.User1Id != null && Model.User2Id != null)) { @: hidden="hidden"
+                             }}>
+                            <input type="submit" value="Play with bot" class="btn btn-info" />
                         </div>
                     </form>
                 }

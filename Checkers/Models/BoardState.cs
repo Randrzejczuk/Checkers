@@ -147,5 +147,33 @@ namespace Checkers.Models
                 return Color.White;
             return Color.None;
         }
+        public List<Move> GetAvailableMoves(Color color)
+        {
+            List<Move> validMoves = new List<Move>();
+            IEnumerable<Field> attacks = Fields
+                .Where(f => f.GetColor() == color)
+                .Where(f => f.CanAttack(this) == true);
+            if (attacks.Any())
+            {
+                foreach (Field field in attacks)
+                {
+                    validMoves.AddRange(field.GetAttacks(this));
+                }
+            }
+            else
+            {
+                IEnumerable<Field> moves = Fields
+               .Where(f => f.GetColor() == color)
+               .Where(f => f.CanMove(this) == true);
+                if (moves.Any())
+                {
+                    foreach (Field field in moves)
+                    {
+                        validMoves.AddRange(field.GetMoves(this));
+                    }
+                }
+            }
+            return validMoves;
+        }
     }
 }

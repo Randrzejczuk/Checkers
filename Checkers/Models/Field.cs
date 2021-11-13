@@ -204,6 +204,186 @@ namespace Checkers.Models
                 return Color.Black;
             return Color.None;
         }
+        public List<Move> GetAttacks(BoardState board)
+        {
+            List<Move> moves = new List<Move>();
+            if (State != State.White)
+            {
+                if (Y < 7)
+                {
+                    if (X < 7)
+                    {
+                        Field NextField = board.GetField(X + 1, Y + 1);
+                        if (NextField.GetColor() != Color.None && NextField.GetColor() != this.GetColor())
+                        {
+                            Field TargetField = board.GetField(X + 2, Y + 2);
+                            if (TargetField.GetColor() == Color.None)
+                            {
+                                moves.Add(new Move()
+                                {
+                                    StartX = X,
+                                    StartY = Y,
+                                    DestroyX = NextField.X,
+                                    DestroyY = NextField.Y,
+                                    TargetX = TargetField.X,
+                                    TargetY = TargetField.Y,
+                                    Isvalid = true
+                                }) ;
 
+                            }
+                        }
+                    }
+                    if (X > 2)
+                    {
+                        Field NextField = board.GetField(X - 1, Y + 1);
+                        if (NextField.GetColor() != Color.None && NextField.GetColor() != this.GetColor())
+                        {
+                            Field TargetField = board.GetField(X - 2, Y + 2);
+                            if (TargetField.GetColor() == Color.None)
+                            {
+                                moves.Add(new Move()
+                                {
+                                    StartX = X,
+                                    StartY = Y,
+                                    DestroyX = NextField.X,
+                                    DestroyY = NextField.Y,
+                                    TargetX = TargetField.X,
+                                    TargetY = TargetField.Y,
+                                    Isvalid = true
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            if (State != State.Black)
+            {
+                if (Y > 2)
+                {
+                    if (X < 7)
+                    {
+                        Field NextField = board.GetField(X + 1, Y - 1);
+                        if (NextField.GetColor() != Color.None && NextField.GetColor() != this.GetColor())
+                        {
+                            Field TargetField = board.GetField(X + 2, Y - 2);
+                            if (TargetField.GetColor() == Color.None)
+                            {
+                                moves.Add(new Move()
+                                {
+                                    StartX = X,
+                                    StartY = Y,
+                                    DestroyX = NextField.X,
+                                    DestroyY = NextField.Y,
+                                    TargetX = TargetField.X,
+                                    TargetY = TargetField.Y,
+                                    Isvalid = true
+                                });
+
+                            }
+                        }
+                    }
+                    if (X > 2)
+                    {
+                        Field NextField = board.GetField(X - 1, Y - 1);
+                        if (NextField.GetColor() != Color.None && NextField.GetColor() != this.GetColor())
+                        {
+                            Field TargetField = board.GetField(X - 2, Y - 2);
+                            if (TargetField.GetColor() == Color.None)
+                            {
+                                moves.Add(new Move()
+                                {
+                                    StartX = X,
+                                    StartY = Y,
+                                    DestroyX = NextField.X,
+                                    DestroyY = NextField.Y,
+                                    TargetX = TargetField.X,
+                                    TargetY = TargetField.Y,
+                                    Isvalid = true
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            return moves;
+        }
+
+        public List<Move> GetMoves(BoardState board)
+        {
+            List<Move> moves = new List<Move>();
+            if (State != State.White)
+            {
+                if (Y < 8)
+                {
+                    if (X < 8)
+                    {
+                        Field TargetField = board.GetField(X + 1, Y + 1);
+                        if (TargetField.GetColor() == Color.None)
+                        {
+                            moves.Add(new Move()
+                            {
+                                StartX = X,
+                                StartY = Y,
+                                TargetX = TargetField.X,
+                                TargetY = TargetField.Y,
+                                Isvalid = true
+                            });
+                        }
+                    }
+                    if (X > 1)
+                    {
+                        Field TargetField = board.GetField(X - 1, Y + 1);
+                        if (TargetField.GetColor() == Color.None)
+                        {
+                            moves.Add(new Move()
+                            {
+                                StartX = X,
+                                StartY = Y,
+                                TargetX = TargetField.X,
+                                TargetY = TargetField.Y,
+                                Isvalid = true
+                            });
+                        }
+                    }
+                }
+            }
+            if (State != State.Black)
+            {
+                if (Y > 1)
+                {
+                    if (X < 8)
+                    {
+                        Field TargetField = board.GetField(X + 1, Y - 1);
+                        if (TargetField.GetColor() == Color.None)
+                        {
+                            moves.Add(new Move()
+                            {
+                                StartX = X,
+                                StartY = Y,
+                                TargetX = TargetField.X,
+                                TargetY = TargetField.Y,
+                                Isvalid = true
+                            });
+                        }
+                    }
+                    if (X > 1)
+                    {
+                        Field TargetField = board.GetField(X - 1, Y - 1);
+                        if (TargetField.GetColor() == Color.None)
+                        {
+                            moves.Add(new Move()
+                            {
+                                StartX = X,
+                                StartY = Y,
+                                TargetX = TargetField.X,
+                                TargetY = TargetField.Y,
+                                Isvalid = true
+                            });
+                        }
+                    }
+                }
+            }
+            return moves;
+        }
     }
 }
