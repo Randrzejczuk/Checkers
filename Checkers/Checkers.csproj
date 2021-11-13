@@ -6,6 +6,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\Migrations\20211106161622_RoomChat.cs" />
+    <Compile Remove="Data\Migrations\20211106161622_RoomChat.Designer.cs" />
+    <Compile Remove="Data\Migrations\20211111192557_Room_chats.cs" />
+    <Compile Remove="Data\Migrations\20211111192557_Room_chats.Designer.cs" />
+    <Compile Remove="Data\Migrations\20211111194246_RoomChats.cs" />
+    <Compile Remove="Data\Migrations\20211111194246_RoomChats.Designer.cs" />
+    <Compile Remove="Data\Migrations\20211111194424_chatrooms.cs" />
+    <Compile Remove="Data\Migrations\20211111194424_chatrooms.Designer.cs" />
+    <Compile Remove="Data\Migrations\20211111195203_Separatechets.cs" />
+    <Compile Remove="Data\Migrations\20211111195203_Separatechets.Designer.cs" />
+    <Compile Remove="Data\Migrations\20211111200438_RoomChats.cs" />
+    <Compile Remove="Data\Migrations\20211111200438_RoomChats.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.5" />

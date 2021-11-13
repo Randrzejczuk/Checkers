@@ -13,14 +13,14 @@ class Move
     }
 }
 //Shows fields, that selected piece can go to, or redirects to move submition process 
-function showAvailable(x, y) {
+function showAvailable(x, y, model, user) {
 
     let myId = (x).toString() + y.toString();
     //Gets selected field
     let myField = document.getElementById(myId);
     //If chosen available field submits move
     if (myField.className == "tile-available") {
-        submit(x,y);
+        submit(x, y, model, user);
     }
     else {
         resetSelection();
@@ -49,16 +49,20 @@ function showAvailable(x, y) {
     }
 }
 //Submits move
-function submit(x,y)
+function submit(x, y, model, user)
 {
     let fields = document.getElementsByClassName("tile-grey");
     let field = fields.item(0);
     let startX = field.id.substring(0, 1);
     let startY = field.id.substring(1, 2);
     let move = new Move(startX, startY, x, y);
-    submitMove(move);
+    submitMove(move, model, user);
 }
-//If move is valid realizes movent, otherwise, displays error message
+//Sends request to hub to realize move
+function submitMove(move, model, user) {
+    connection.invoke('SubmitMove', move, model, user);
+}
+//If move is valid realizes movement, otherwise, displays error message
 function realizeMovement(move, message)
 {
     if (move.isvalid) {
@@ -140,4 +144,12 @@ function gameOver(message,userId) {
     surrButton.hidden = true;
     if (userId == null)
         refresh();
+}
+//Sends to hub command to start game
+function startButtonPressed(model) {
+    connection.invoke('StartGame', model);
+}
+//Sends to hub informaion that one of the players has surrendered
+function surrenderButtonPressed(model, user) {
+    connection.invoke('SurrenderGame', model, user);
 }

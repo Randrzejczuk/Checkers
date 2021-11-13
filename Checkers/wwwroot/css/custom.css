@@ -99,6 +99,21 @@
 .playerTableButton:hover {
     background-color:silver
 }
+.chat
+{
+    height: 490px;
+}
+.chat-small {
+    height: 370px;
+}
+.msg
+{
+    vertical-align:bottom;
+}
+.spacer
+{
+    height:50px
+}
 
 #noPadding{
     padding: 0px

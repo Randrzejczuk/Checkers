@@ -159,6 +159,15 @@ namespace Checkers.Hubs
             else
                 aTimer.Enabled = false;
         }
+        public async Task SendMessage(string UserId, int? roomId)
+        {
+            string message = _context.Messages
+                  .Where(m => m.UserId == UserId && m.RoomId == roomId)
+                  .OrderByDescending(m => m.Posted)
+                  .FirstOrDefault()
+                  .MessageToDisplay();
+            await Clients.Group(roomId.ToString()).SendAsync("receiveMessage", message);
+        }
     }
 
 }

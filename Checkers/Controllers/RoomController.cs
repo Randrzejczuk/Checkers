@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -31,6 +32,7 @@ namespace Checkers.Controllers
                 .Include(r => r.Board.Fields)
                 .Include(r => r.User1)
                 .Include(r => r.User2)
+                .Include(r => r.Messages)
                 .FirstOrDefault();
             if (room != null)
                 return room;
@@ -81,14 +83,15 @@ namespace Checkers.Controllers
         {
             try
             {
-
                 Room room = GetRoom(roomId);
+                room.Messages = room.Messages.OrderBy(m => m.Posted).TakeLast(15).ToList();
                 var userId = _userManager.GetUserId(User);
                 ViewBag.currentUserId = userId;
                 return View(room);
             }
-            catch
+            catch (Exception ex)
             {
+                string a = ex.Message;
                 return RedirectToAction("List");
             }
         }
@@ -153,6 +156,7 @@ namespace Checkers.Controllers
                         room.User1IsActive = false;
                         if (room.User2 == null)
                         {
+                            _context.Messages.RemoveRange(room.Messages);
                             _context.Rooms.Remove(room);
                             _context.SaveChanges();
                             return RedirectToAction("List");
@@ -192,6 +196,21 @@ namespace Checkers.Controllers
             {
                 return RedirectToAction("List");
             }
+        }
+        [Authorize]
+        public async Task<IActionResult> AddMessage(string userId, string text, int roomId)
+        {
+            Message message = new Message()
+            {
+                RoomId = roomId,
+                Text = text,
+                UserId = userId,
+                UserName = User.Identity.Name,
+                Posted = DateTime.Now,
+            };
+                await _context.Messages.AddAsync(message);
+                await _context.SaveChangesAsync();
+                return Ok();
         }
     }
 }

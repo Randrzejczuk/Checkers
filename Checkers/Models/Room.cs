@@ -26,6 +26,7 @@ namespace Checkers.Models
         public TimeSpan User2Time { get; set; }
         public bool ActiveUser { get; set; }
         public bool IsActive { get; set; }
+        public List<Message> Messages {get;set;}
 
 
         public string ValidatePlayer(string userId, Move move)

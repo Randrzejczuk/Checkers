@@ -38,6 +38,7 @@ namespace Checkers.Controllers
             if (User.Identity.IsAuthenticated)
                 ViewBag.CurrentUserName = currentUser.UserName;
             List<Message> allmessages = await _context.Messages
+                .Where(m=>m.RoomId==null)
                 .OrderBy(m => m.Posted)
                 .ToListAsync();
             IEnumerable<Message> messages = allmessages.TakeLast(20);

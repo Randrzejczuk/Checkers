@@ -19,22 +19,22 @@
             <input type="submit" value="Create room" class="btn btn-info" />
         </div>
     </form>
-
+    <div class="spacer"></div>
     <table class="table table-hover">
-            <tr class="table-info">
-                <th>
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.User1)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.User2)
-                </th>
-                <th>
+        <tr class="table-info">
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.User1)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.User2)
+            </th>
+            <th>
 
-                </th>
-            </tr>
+            </th>
+        </tr>
         <tbody>
             @foreach (var item in Model)
             {

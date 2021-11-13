@@ -16,10 +16,10 @@ namespace Checkers.Hubs
         {
             _context = context;
         }
-        public async Task SendMessage(string UserId)
+        public async Task SendMessage(string UserId,int? roomId)
         {
           string message = _context.Messages
-                .Where(m => m.UserId == UserId)
+                .Where(m => m.UserId == UserId && m.RoomId==roomId)
                 .OrderByDescending(m=>m.Posted)
                 .FirstOrDefault()
                 .MessageToDisplay();
