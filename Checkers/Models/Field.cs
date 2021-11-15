@@ -204,9 +204,9 @@ namespace Checkers.Models
                 return Color.Black;
             return Color.None;
         }
-        public List<Move> GetAttacks(BoardState board)
+        public List<AiMove> GetAttacks(BoardState board)
         {
-            List<Move> moves = new List<Move>();
+            List<AiMove> moves = new List<AiMove>();
             if (State != State.White)
             {
                 if (Y < 7)
@@ -219,7 +219,7 @@ namespace Checkers.Models
                             Field TargetField = board.GetField(X + 2, Y + 2);
                             if (TargetField.GetColor() == Color.None)
                             {
-                                moves.Add(new Move()
+                                moves.Add(new AiMove()
                                 {
                                     StartX = X,
                                     StartY = Y,
@@ -227,9 +227,9 @@ namespace Checkers.Models
                                     DestroyY = NextField.Y,
                                     TargetX = TargetField.X,
                                     TargetY = TargetField.Y,
-                                    Isvalid = true
+                                    Isvalid = true,
+                                    Score = State == State.Black && TargetField.Y == 8 ? 2 : 1
                                 }) ;
-
                             }
                         }
                     }
@@ -241,7 +241,7 @@ namespace Checkers.Models
                             Field TargetField = board.GetField(X - 2, Y + 2);
                             if (TargetField.GetColor() == Color.None)
                             {
-                                moves.Add(new Move()
+                                moves.Add(new AiMove()
                                 {
                                     StartX = X,
                                     StartY = Y,
@@ -249,7 +249,8 @@ namespace Checkers.Models
                                     DestroyY = NextField.Y,
                                     TargetX = TargetField.X,
                                     TargetY = TargetField.Y,
-                                    Isvalid = true
+                                    Isvalid = true,
+                                    Score = State == State.Black && TargetField.Y == 8 ? 2 : 1
                                 });
                             }
                         }
@@ -268,7 +269,7 @@ namespace Checkers.Models
                             Field TargetField = board.GetField(X + 2, Y - 2);
                             if (TargetField.GetColor() == Color.None)
                             {
-                                moves.Add(new Move()
+                                moves.Add(new AiMove()
                                 {
                                     StartX = X,
                                     StartY = Y,
@@ -276,7 +277,8 @@ namespace Checkers.Models
                                     DestroyY = NextField.Y,
                                     TargetX = TargetField.X,
                                     TargetY = TargetField.Y,
-                                    Isvalid = true
+                                    Isvalid = true,
+                                    Score = State == State.White && TargetField.Y == 1 ? 2 : 1
                                 });
 
                             }
@@ -290,7 +292,7 @@ namespace Checkers.Models
                             Field TargetField = board.GetField(X - 2, Y - 2);
                             if (TargetField.GetColor() == Color.None)
                             {
-                                moves.Add(new Move()
+                                moves.Add(new AiMove()
                                 {
                                     StartX = X,
                                     StartY = Y,
@@ -298,7 +300,8 @@ namespace Checkers.Models
                                     DestroyY = NextField.Y,
                                     TargetX = TargetField.X,
                                     TargetY = TargetField.Y,
-                                    Isvalid = true
+                                    Isvalid = true,
+                                    Score = State == State.White && TargetField.Y == 1 ? 2 : 1
                                 });
                             }
                         }
@@ -308,9 +311,9 @@ namespace Checkers.Models
             return moves;
         }
 
-        public List<Move> GetMoves(BoardState board)
+        public List<AiMove> GetMoves(BoardState board)
         {
-            List<Move> moves = new List<Move>();
+            List<AiMove> moves = new List<AiMove>();
             if (State != State.White)
             {
                 if (Y < 8)
@@ -320,13 +323,14 @@ namespace Checkers.Models
                         Field TargetField = board.GetField(X + 1, Y + 1);
                         if (TargetField.GetColor() == Color.None)
                         {
-                            moves.Add(new Move()
+                            moves.Add(new AiMove()
                             {
                                 StartX = X,
                                 StartY = Y,
                                 TargetX = TargetField.X,
                                 TargetY = TargetField.Y,
-                                Isvalid = true
+                                Isvalid = true,
+                                Score = State == State.Black && TargetField.Y == 8 ? 1 : 0
                             });
                         }
                     }
@@ -335,13 +339,14 @@ namespace Checkers.Models
                         Field TargetField = board.GetField(X - 1, Y + 1);
                         if (TargetField.GetColor() == Color.None)
                         {
-                            moves.Add(new Move()
+                            moves.Add(new AiMove()
                             {
                                 StartX = X,
                                 StartY = Y,
                                 TargetX = TargetField.X,
                                 TargetY = TargetField.Y,
-                                Isvalid = true
+                                Isvalid = true,
+                                Score = State == State.Black && TargetField.Y == 8 ? 1 : 0
                             });
                         }
                     }
@@ -356,13 +361,14 @@ namespace Checkers.Models
                         Field TargetField = board.GetField(X + 1, Y - 1);
                         if (TargetField.GetColor() == Color.None)
                         {
-                            moves.Add(new Move()
+                            moves.Add(new AiMove()
                             {
                                 StartX = X,
                                 StartY = Y,
                                 TargetX = TargetField.X,
                                 TargetY = TargetField.Y,
-                                Isvalid = true
+                                Isvalid = true,
+                                Score = State == State.White && TargetField.Y == 1 ? 1 : 0
                             });
                         }
                     }
@@ -371,13 +377,14 @@ namespace Checkers.Models
                         Field TargetField = board.GetField(X - 1, Y - 1);
                         if (TargetField.GetColor() == Color.None)
                         {
-                            moves.Add(new Move()
+                            moves.Add(new AiMove()
                             {
                                 StartX = X,
                                 StartY = Y,
                                 TargetX = TargetField.X,
                                 TargetY = TargetField.Y,
-                                Isvalid = true
+                                Isvalid = true,
+                                Score = State == State.White && TargetField.Y == 1 ? 1 : 0
                             });
                         }
                     }

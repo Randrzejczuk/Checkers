@@ -12,6 +12,22 @@ namespace Checkers.Models
         public int Id { get; set; }
         public List<Field> Fields { get; set; }
         public Field LastMoved { get; set; }
+        public BoardState()
+        {
+        }
+        public BoardState (BoardState board)
+        {
+            Fields = new List<Field>();
+            foreach(Field field in board.Fields)
+            {
+                Fields.Add(new Field
+                {
+                    X = field.X,
+                    Y = field.Y,
+                    State = field.State
+                });
+            }
+        }
         public void Init()
         {
             if (Fields == null)
@@ -114,12 +130,11 @@ namespace Checkers.Models
                     move.DestroyX = (move.StartX + move.TargetX) / 2;
                     move.DestroyY = (move.StartY + move.TargetY) / 2;
                 }
-                RecordMovement(move);
                 return "";
             }
             return "You have to attack enemy piece.";
         }
-        private void RecordMovement(Move move)
+        public BoardState RecordMovement(Move move)
         {
             Field start = GetField(move.StartX, move.StartY);
             Field target = GetField(move.TargetX, move.TargetY);
@@ -134,6 +149,7 @@ namespace Checkers.Models
                 destroy.State = State.Empty;
             }
             LastMoved = target;
+            return this;
         }
         public Color CheckWinner ()
         {
@@ -147,9 +163,9 @@ namespace Checkers.Models
                 return Color.White;
             return Color.None;
         }
-        public List<Move> GetAvailableMoves(Color color)
+        public List<AiMove> GetAvailableMoves(Color color)
         {
-            List<Move> validMoves = new List<Move>();
+            List<AiMove> validMoves = new List<AiMove>();
             IEnumerable<Field> attacks = Fields
                 .Where(f => f.GetColor() == color)
                 .Where(f => f.CanAttack(this) == true);

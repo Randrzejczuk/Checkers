@@ -41,6 +41,7 @@ namespace Checkers.Hubs
                 errorMessage = room.Board.ValidateMove(move);
             if (move.Isvalid)
             {
+                room.Board.RecordMovement(move);
                 if (Math.Abs(move.TargetX - move.StartX) == 2)
                 {
                     Field field = room.Board.GetField(move.TargetX, move.TargetY);
@@ -82,7 +83,7 @@ namespace Checkers.Hubs
                 .FirstOrDefault();
             if (room.IsActive)
             {
-                SetTimer(room);
+               // SetTimer(room);
                 await Clients.Group(roomId).SendAsync("refresh");
             }
             if (room.User1.UserName == "BOT")
@@ -193,21 +194,96 @@ namespace Checkers.Hubs
         {
             Room room = _context.Rooms
                 .Where(r => r.Id.ToString() == roomId)
+                .Include(r=>r.Board.Fields)
                 .Include(r => r.User1)
                 .Include(r => r.User2)
                 .FirstOrDefault();
             string botId = room.User1.UserName == "BOT" ? room.User1Id : room.User2Id;
             Color botColor = room.ActiveUser ? Color.Black : Color.White;
-
-            List<Move> AvailableMoves = room.Board.GetAvailableMoves(botColor);
-            if (AvailableMoves.Any())
+            AiMove move = GetBestMove(true, botColor, new BoardState(room.Board), 4);
+            if (move!=null)
             {
-                //TO DO: Nadać Jakiś sens ruchom bota
-                await SubmitMove(AvailableMoves.FirstOrDefault(),roomId,botId);
+                Thread.Sleep(1000);
+                await SubmitMove(move, roomId,botId);
             }
             else
             {
                await SurrenderGame(roomId, botId);
+            }
+        }
+        private AiMove GetBestMove(bool isAiTurn, Color botColor,BoardState board,int depth)
+        {
+            List<AiMove> AvailableMoves;
+            AiMove selectedMove;
+            if (isAiTurn)
+                AvailableMoves = board.GetAvailableMoves(botColor);
+            else
+            {
+                Color playerColor = botColor == Color.White ? Color.Black : Color.White;
+                AvailableMoves = board.GetAvailableMoves(playerColor);
+            }
+
+            //Escape condition
+            if (depth == 0)
+            {
+                foreach (AiMove move in AvailableMoves)
+                {
+                    BoardState afterMove = new BoardState(board);
+                    afterMove = afterMove.RecordMovement(move);
+                    Field target = afterMove.GetField(move.TargetX, move.TargetY);
+                    if (move.DestroyX != null && target.CanAttack(afterMove))
+                        move.Score++;
+                }
+                selectedMove = AvailableMoves.FirstOrDefault(m => m.Score == AvailableMoves.Max(a => a.Score));
+                /*if (isAiTurn)
+                    selectedMove = AvailableMoves.FirstOrDefault(m => m.Score == AvailableMoves.Max(a => a.Score));
+                else
+                    selectedMove = AvailableMoves.FirstOrDefault(m => m.Score == AvailableMoves.Min(a => a.Score));*/
+                /*if (!isAiTurn && selectedMove!=null)
+                    selectedMove.Score = 0 - selectedMove.Score;*/
+                return selectedMove; 
+            }
+            else
+            {
+                foreach (AiMove move in AvailableMoves)
+                {
+                    BoardState afterMove = new BoardState(board);
+                    afterMove = afterMove.RecordMovement(move);
+                    Field target = afterMove.GetField(move.TargetX, move.TargetY);
+                    if (move.DestroyX != null && target.CanAttack(afterMove))
+                    {
+                        move.Score++;
+                        AiMove nextMove = GetBestMove(isAiTurn, botColor, afterMove, depth - 1);
+                        if (nextMove!=null)
+                        {
+                            move.Score += nextMove.Score;
+                           /* if (isAiTurn)
+                                move.Score += nextMove.Score;
+                            else
+                                move.Score -= nextMove.Score;*/
+                        }
+                    }
+                    else
+                    {
+                        AiMove nextMove = GetBestMove(!isAiTurn, botColor, afterMove, depth - 1);
+                        if (nextMove != null)
+                        {
+                            move.Score -= nextMove.Score;
+                            /* if (!isAiTurn)
+                                 move.Score += nextMove.Score;
+                             else
+                                 move.Score -= nextMove.Score;*/
+                        }
+                    }
+                }
+                selectedMove = AvailableMoves.FirstOrDefault(m => m.Score == AvailableMoves.Max(a => a.Score));
+                /*if (isAiTurn)
+                        selectedMove = AvailableMoves.FirstOrDefault(m => m.Score == AvailableMoves.Max(a => a.Score));
+                    else
+                        selectedMove = AvailableMoves.FirstOrDefault(m => m.Score == AvailableMoves.Min(a => a.Score));
+                */
+
+                return selectedMove;
             }
         }
     }
