@@ -27,7 +27,7 @@
                             case State.Black:
                                 <td>
                                     <form asp-action="Room" asp-route-roomId="@Model.Id"
-                                          data-ajax-success="showAvailable(@x,@y,'@Model.Id','@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST">
+                                          data-ajax-success="showAvailable(@x,@y,@Model.Id,'@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST">
                                         <button class="tile-white" name="b" id=@(x.ToString() + y.ToString())>
                                             <img src="~/images/Black.png" class="checker" />
                                         </button>
@@ -37,7 +37,7 @@
                             case State.White:
                                 <td>
                                     <form asp-action="Room" asp-route-roomId="@Model.Id"
-                                          data-ajax-success="showAvailable(@x,@y,'@Model.Id','@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST">
+                                          data-ajax-success="showAvailable(@x,@y,@Model.Id,'@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST">
                                         <button class="tile-white" name="w" id=@(x.ToString() + y.ToString())>
                                             <img src="~/images/White.png" class="checker" />
                                         </button>
@@ -47,7 +47,7 @@
                             case State.Black_Q:
                                 <td>
                                     <form asp-action="Room" asp-route-roomId="@Model.Id"
-                                          data-ajax-success="showAvailable(@x,@y,'@Model.Id','@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST">
+                                          data-ajax-success="showAvailable(@x,@y,@Model.Id,'@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST">
                                         <button class="tile-white" name="B" id=@(x.ToString() + y.ToString())>
                                             <img src="~/images/Black Q.png" class="checker" />
                                         </button>
@@ -57,7 +57,7 @@
                             case State.White_Q:
                                 <td>
                                     <form asp-action="Room" asp-route-roomId="@Model.Id"
-                                          data-ajax-success="showAvailable(@x,@y,'@Model.Id','@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST">
+                                          data-ajax-success="showAvailable(@x,@y,@Model.Id,'@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST">
                                         <button class="tile-white" name="W" id=@(x.ToString() + y.ToString())>
                                             <img src="~/images/White Q.png" class="checker" />
                                         </button>
@@ -66,7 +66,7 @@
                                 break;
                             case State.Empty:
                                 <td>
-                                    <form data-ajax-success="showAvailable(@x,@y,'@Model.Id','@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST">
+                                    <form data-ajax-success="showAvailable(@x,@y,@Model.Id,'@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST">
                                         <button class="tile-white" name="e" id=@(x.ToString() + y.ToString())>
                                         </button>
                                     </form>
@@ -92,7 +92,7 @@
             </tr>
             <tr>
                 <td class="playerTableBottom" id="noPadding">
-                    <form data-ajax-success="surrenderButtonPressed('@Model.Id','@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST"
+                    <form data-ajax-success="surrenderButtonPressed(@Model.Id,'@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST"
                           asp-action="JoinButton" asp-route-roomId="@Model.Id" asp-route-buttonId="1" class="playerTableButton">
                         <button type="submit" class="playerTableButton table-hover" @{ if (ViewBag.currentUserId == null || (Model.User1Id != ViewBag.currentUserId && Model.User1Id != null)) { @: disabled="disabled"
                                 }}>
@@ -101,7 +101,7 @@
                     </form>
                 </td>
                 <td class="playerTableBottom" id="noPadding">
-                    <form data-ajax-success="surrenderButtonPressed('@Model.Id','@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST"
+                    <form data-ajax-success="surrenderButtonPressed(@Model.Id,'@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST"
                           asp-action="JoinButton" asp-route-roomId="@Model.Id" asp-route-buttonId="2" class="playerTableButton">
                         <button type="submit" class="playerTableButton table-hover" @{ if (ViewBag.currentUserId == null || (Model.User2Id != ViewBag.currentUserId && Model.User2Id != null)) { @: disabled="disabled"
                                 }}>
@@ -122,20 +122,20 @@
         <div class="spacer">
             @{ if (ViewBag.currentUserId != null && (ViewBag.currentUserId == Model.User1Id || ViewBag.currentUserId == Model.User2Id))
                 { @:
-                    <form data-ajax-success="surrenderButtonPressed('@Model.Id','@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST">
+                    <form data-ajax-success="surrenderButtonPressed(@Model.Id,'@ViewBag.currentUserId')" data-ajax="true" data-ajax-method="POST">
                         <div class="form-group menuItem" id="Surr" @{ if (!Model.IsActive) { @: hidden="hidden"
                              }}>
                             <input type="submit" value="Surrender" class="btn btn-info" />
                         </div>
                     </form>
-                    <form data-ajax-success="startButtonPressed('@Model.Id')" data-ajax="true" data-ajax-method="POST"
+                    <form data-ajax-success="startButtonPressed(@Model.Id)" data-ajax="true" data-ajax-method="POST"
                           asp-action="StartButton" asp-route-roomId="@Model.Id">
                         <div class="form-group menuItem" id="Start" @{ if (Model.IsActive || Model.User1Id == null || Model.User2Id == null) { @: hidden="hidden"
                              }}>
                             <input type="submit" value="Start" class="btn btn-info" />
                         </div>
                     </form>
-                    <form data-ajax-success="startButtonPressed('@Model.Id')" data-ajax="true" data-ajax-method="POST"
+                    <form data-ajax-success="startButtonPressed(@Model.Id)" data-ajax="true" data-ajax-method="POST"
                           asp-action="PlayWithBot" asp-route-roomId="@Model.Id">
                         <div class="form-group menuItem" id="Start" @{ if (Model.IsActive || (Model.User1Id != null && Model.User2Id != null)) { @: hidden="hidden"
                              }}>
@@ -193,7 +193,5 @@
     .catch(error => {
     console.error(error.message);
     });
-
-
     </script>
 }

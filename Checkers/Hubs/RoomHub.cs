@@ -26,15 +26,19 @@ namespace Checkers.Hubs
         {
             return Groups.AddToGroupAsync(Context.ConnectionId, roomId);
         }
-        public async Task SubmitMove(Move move, string roomId, string userId)
+        private Room GetRoom(int roomId)
         {
             Room room = _context.Rooms
-                .Where(r => r.Id.ToString() == roomId)
                 .Include(r => r.Board)
                 .Include(r => r.Board.Fields)
                 .Include(r => r.User1)
                 .Include(r => r.User2)
-                .FirstOrDefault();
+                .FirstOrDefault(r => r.Id == roomId);
+            return room;
+        }
+        public async Task SubmitMove(Move move, int roomId, string userId)
+        {
+            Room room = GetRoom(roomId);
 
             string errorMessage = room.ValidatePlayer(userId, move);
             if (errorMessage == "")
@@ -55,17 +59,17 @@ namespace Checkers.Hubs
                 switch (winner)
                 {
                     case Color.None:
-                        await Clients.Group(roomId).SendAsync("realizeMovement", move, "");
+                        await Clients.Group(roomId.ToString()).SendAsync("realizeMovement", move, "");
                         break;
                     case Color.Black:
-                        room.IsActive = false;
+                        room.gameOver();
                         _context.SaveChanges();
-                        await Clients.Group(roomId).SendAsync("realizeMovement", move, "Black player wins!");
+                        await Clients.Group(roomId.ToString()).SendAsync("realizeMovement", move, "Black player wins!");
                         break;
                     case Color.White:
-                        room.IsActive = false;
+                        room.gameOver();
                         _context.SaveChanges();
-                        await Clients.Group(roomId).SendAsync("realizeMovement", move, "White player wins!");
+                        await Clients.Group(roomId.ToString()).SendAsync("realizeMovement", move, "White player wins!");
                         break;
                 }
                 if ((!room.ActiveUser && room.User1.UserName == "BOT") || (room.ActiveUser && room.User2.UserName == "BOT"))
@@ -74,28 +78,20 @@ namespace Checkers.Hubs
             else
                 await Clients.Caller.SendAsync("realizeMovement", move, errorMessage);
         }
-        public async Task StartGame(string roomId)
+        public async Task StartGame(int roomId)
         {
-            Room room = _context.Rooms
-                .Where(r => r.Id.ToString() == roomId)
-                .Include(r=>r.User1)
-                .Include(r => r.User2)
-                .FirstOrDefault();
+            Room room = GetRoom(roomId);
             if (room.IsActive)
             {
-               // SetTimer(room);
-                await Clients.Group(roomId).SendAsync("refresh");
+                SetTimer(room);
+                await Clients.Group(roomId.ToString()).SendAsync("refresh");
             }
             if (room.User1.UserName == "BOT")
                 await BotMovement(roomId);
         }
-        public async Task SurrenderGame(string roomId, string userId)
+        public async Task SurrenderGame(int roomId, string userId)
         {
-            Room room = _context.Rooms
-                .Where(r => r.Id.ToString() == roomId)
-                .Include(r=>r.User1)
-                .Include(r => r.User2)
-                .FirstOrDefault();
+            Room room = GetRoom(roomId);
             if (room != null)
             {
                 if (room.User1 != null && room.User1.UserName == "BOT")
@@ -112,25 +108,25 @@ namespace Checkers.Hubs
                 {
                     if (userId == room.User1Id || room.User1Id == null)
                     {
-                        room.IsActive = false;
+                        room.gameOver();
                         _context.SaveChanges();
-                        await Clients.Group(roomId).SendAsync("gameOver", "White player surrendered, Black player wins!", room.User1Id);
+                        await Clients.Group(roomId.ToString()).SendAsync("gameOver", "White player surrendered, Black player wins!", room.User1Id);
                     }
                     else
                     {
-                        room.IsActive = false;
+                        room.gameOver();
                         _context.SaveChanges();
-                        await Clients.Group(roomId).SendAsync("gameOver", "Black player surrendered, White player wins!", room.User1Id);
+                        await Clients.Group(roomId.ToString()).SendAsync("gameOver", "Black player surrendered, White player wins!", room.User1Id);
                     }
                 }
                 else
                 {
-                    await Clients.Group(roomId).SendAsync("refresh");
+                    await Clients.Group(roomId.ToString()).SendAsync("refresh");
                 }
             }
             else
             {
-                await Clients.Group(roomId).SendAsync("refresh");
+                await Clients.Group(roomId.ToString()).SendAsync("refresh");
             }
         }
         private void SetTimer(Room room)
@@ -150,7 +146,13 @@ namespace Checkers.Hubs
 
             using var scope = _serviceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetService<ApplicationDbContext>();
-            Room room = dbContext.Rooms.Where(r => r.Id == aTimer.room.Id).FirstOrDefault();
+            Room room = dbContext.Rooms
+                .Where(r => r.Id == aTimer.room.Id)
+                .Include(r => r.Board)
+                .Include(r => r.Board.Fields)
+                .Include(r => r.User1)
+                .Include(r => r.User2)
+                .FirstOrDefault();
             if (room != null && room.IsActive)
             {
                 if (!room.ActiveUser)
@@ -160,15 +162,15 @@ namespace Checkers.Hubs
 
                 if (room.User1Time <= TimeSpan.Zero)
                 {
-                    aTimer.Enabled = false;
-                    room.IsActive = false;
+                    //aTimer.Enabled = false;
+                    room.gameOver();
                     dbContext.SaveChanges();
                     await hubClients.Group(room.Id.ToString()).SendAsync("gameOver", "White player ran out of time, Black player wins!");
                 }
                 else if (room.User2Time <= TimeSpan.Zero)
                 {
-                    aTimer.Enabled = false;
-                    room.IsActive = false;
+                    //aTimer.Enabled = false;
+                    room.gameOver();
                     dbContext.SaveChanges();
                     await hubClients.Group(room.Id.ToString()).SendAsync("gameOver", "Black player ran out of time, White player wins!");
                 }
@@ -190,17 +192,12 @@ namespace Checkers.Hubs
                   .MessageToDisplay();
             await Clients.Group(roomId.ToString()).SendAsync("receiveMessage", message);
         }
-        private async Task BotMovement(string roomId)
+        private async Task BotMovement(int roomId)
         {
-            Room room = _context.Rooms
-                .Where(r => r.Id.ToString() == roomId)
-                .Include(r=>r.Board.Fields)
-                .Include(r => r.User1)
-                .Include(r => r.User2)
-                .FirstOrDefault();
+            Room room = GetRoom(roomId);
             string botId = room.User1.UserName == "BOT" ? room.User1Id : room.User2Id;
             Color botColor = room.ActiveUser ? Color.Black : Color.White;
-            AiMove move = GetBestMove(true, botColor, new BoardState(room.Board), 4);
+            AiMove move = room.Board.GetBestMove(true, botColor, new BoardState(room.Board), 4);
             if (move!=null)
             {
                 Thread.Sleep(1000);
@@ -209,81 +206,6 @@ namespace Checkers.Hubs
             else
             {
                await SurrenderGame(roomId, botId);
-            }
-        }
-        private AiMove GetBestMove(bool isAiTurn, Color botColor,BoardState board,int depth)
-        {
-            List<AiMove> AvailableMoves;
-            AiMove selectedMove;
-            if (isAiTurn)
-                AvailableMoves = board.GetAvailableMoves(botColor);
-            else
-            {
-                Color playerColor = botColor == Color.White ? Color.Black : Color.White;
-                AvailableMoves = board.GetAvailableMoves(playerColor);
-            }
-
-            //Escape condition
-            if (depth == 0)
-            {
-                foreach (AiMove move in AvailableMoves)
-                {
-                    BoardState afterMove = new BoardState(board);
-                    afterMove = afterMove.RecordMovement(move);
-                    Field target = afterMove.GetField(move.TargetX, move.TargetY);
-                    if (move.DestroyX != null && target.CanAttack(afterMove))
-                        move.Score++;
-                }
-                selectedMove = AvailableMoves.FirstOrDefault(m => m.Score == AvailableMoves.Max(a => a.Score));
-                /*if (isAiTurn)
-                    selectedMove = AvailableMoves.FirstOrDefault(m => m.Score == AvailableMoves.Max(a => a.Score));
-                else
-                    selectedMove = AvailableMoves.FirstOrDefault(m => m.Score == AvailableMoves.Min(a => a.Score));*/
-                /*if (!isAiTurn && selectedMove!=null)
-                    selectedMove.Score = 0 - selectedMove.Score;*/
-                return selectedMove; 
-            }
-            else
-            {
-                foreach (AiMove move in AvailableMoves)
-                {
-                    BoardState afterMove = new BoardState(board);
-                    afterMove = afterMove.RecordMovement(move);
-                    Field target = afterMove.GetField(move.TargetX, move.TargetY);
-                    if (move.DestroyX != null && target.CanAttack(afterMove))
-                    {
-                        move.Score++;
-                        AiMove nextMove = GetBestMove(isAiTurn, botColor, afterMove, depth - 1);
-                        if (nextMove!=null)
-                        {
-                            move.Score += nextMove.Score;
-                           /* if (isAiTurn)
-                                move.Score += nextMove.Score;
-                            else
-                                move.Score -= nextMove.Score;*/
-                        }
-                    }
-                    else
-                    {
-                        AiMove nextMove = GetBestMove(!isAiTurn, botColor, afterMove, depth - 1);
-                        if (nextMove != null)
-                        {
-                            move.Score -= nextMove.Score;
-                            /* if (!isAiTurn)
-                                 move.Score += nextMove.Score;
-                             else
-                                 move.Score -= nextMove.Score;*/
-                        }
-                    }
-                }
-                selectedMove = AvailableMoves.FirstOrDefault(m => m.Score == AvailableMoves.Max(a => a.Score));
-                /*if (isAiTurn)
-                        selectedMove = AvailableMoves.FirstOrDefault(m => m.Score == AvailableMoves.Max(a => a.Score));
-                    else
-                        selectedMove = AvailableMoves.FirstOrDefault(m => m.Score == AvailableMoves.Min(a => a.Score));
-                */
-
-                return selectedMove;
             }
         }
     }

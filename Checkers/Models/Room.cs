@@ -42,5 +42,13 @@ namespace Checkers.Models
                 return "This is enemy piece.";
             return "";
         }
+        public void gameOver()
+        {
+            IsActive = false;
+            if (User1 != null && User1.UserName == "BOT")
+                User1 = null;
+            if (User2 != null && User2.UserName == "BOT")
+                User2 = null;
+        }
     }
 }

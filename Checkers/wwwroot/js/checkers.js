@@ -86,8 +86,8 @@ function realizeMovement(move, message)
             destroy.setAttribute("Name", "e");
         }
         if (message != "") {
-            alert(message);
             window.location.reload(true);
+            alert(message);
         }
     }
     else

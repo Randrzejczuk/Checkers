@@ -30,6 +30,7 @@ namespace Checkers.Models
         }
         public void Init()
         {
+            LastMoved = null;
             if (Fields == null)
             {
                 Fields = new List<Field>();
@@ -54,7 +55,7 @@ namespace Checkers.Models
         }
         public Field GetField(int x, int y)
         {
-            Field field = Fields.Where(f => f.X == x && f.Y == y).FirstOrDefault();
+            Field field = Fields.FirstOrDefault(f => f.X == x && f.Y == y);
             return field;
         }
         public void SetState(string state)
@@ -163,7 +164,7 @@ namespace Checkers.Models
                 return Color.White;
             return Color.None;
         }
-        public List<AiMove> GetAvailableMoves(Color color)
+        private List<AiMove> GetAvailableMoves(Color color)
         {
             List<AiMove> validMoves = new List<AiMove>();
             IEnumerable<Field> attacks = Fields
@@ -190,6 +191,56 @@ namespace Checkers.Models
                 }
             }
             return validMoves;
+        }
+        public AiMove GetBestMove(bool isAiTurn, Color botColor, BoardState board, int depth)
+        {
+            List<AiMove> AvailableMoves;
+            AiMove selectedMove;
+            if (isAiTurn)
+                AvailableMoves = board.GetAvailableMoves(botColor);
+            else
+            {
+                Color playerColor = botColor == Color.White ? Color.Black : Color.White;
+                AvailableMoves = board.GetAvailableMoves(playerColor);
+            }
+            //Escape condition
+            if (depth == 0)
+            {
+                foreach (AiMove move in AvailableMoves)
+                {
+                    BoardState afterMove = new BoardState(board);
+                    afterMove = afterMove.RecordMovement(move);
+                    Field target = afterMove.GetField(move.TargetX, move.TargetY);
+                    if (move.DestroyX != null && target.CanAttack(afterMove))
+                        move.Score++;
+                }
+                selectedMove = AvailableMoves.FirstOrDefault(m => m.Score == AvailableMoves.Max(a => a.Score));
+                return selectedMove;
+            }
+            else
+            {
+                foreach (AiMove move in AvailableMoves)
+                {
+                    BoardState afterMove = new BoardState(board);
+                    afterMove = afterMove.RecordMovement(move);
+                    Field target = afterMove.GetField(move.TargetX, move.TargetY);
+                    if (move.DestroyX != null && target.CanAttack(afterMove))
+                    {
+                        move.Score++;
+                        AiMove nextMove = GetBestMove(isAiTurn, botColor, afterMove, depth - 1);
+                        if (nextMove != null)
+                            move.Score += nextMove.Score;
+                    }
+                    else
+                    {
+                        AiMove nextMove = GetBestMove(!isAiTurn, botColor, afterMove, depth - 1);
+                        if (nextMove != null)
+                            move.Score -= nextMove.Score;
+                    }
+                }
+                selectedMove = AvailableMoves.FirstOrDefault(m => m.Score == AvailableMoves.Max(a => a.Score));
+                return selectedMove;
+            }
         }
     }
 }
