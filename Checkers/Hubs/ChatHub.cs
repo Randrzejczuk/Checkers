@@ -16,6 +16,9 @@ namespace Checkers.Hubs
         {
             _context = context;
         }
+        /*
+        * Sends message to every user in public chat
+        */
         public async Task SendMessage(string UserId,int? roomId)
         {
           string message = _context.Messages

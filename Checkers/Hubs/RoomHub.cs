@@ -1,7 +1,6 @@
 ﻿using Checkers.Models;
 using Microsoft.AspNetCore.SignalR;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using System.Threading.Tasks;
@@ -22,10 +21,16 @@ namespace Checkers.Hubs
             _context = context;
             _serviceScopeFactory = serviceScopeFactory;
         }
+        /*
+         * Sends info to every user in room, that player joined
+         */
         public Task JoinRoom(string roomId)
         {
             return Groups.AddToGroupAsync(Context.ConnectionId, roomId);
         }
+        /*
+         * Returns room from database by its roomId
+         */
         private Room GetRoom(int roomId)
         {
             Room room = _context.Rooms
@@ -36,6 +41,9 @@ namespace Checkers.Hubs
                 .FirstOrDefault(r => r.Id == roomId);
             return room;
         }
+        /*
+         * Validates processes move request
+         */
         public async Task SubmitMove(Move move, int roomId, string userId)
         {
             Room room = GetRoom(roomId);
@@ -78,6 +86,9 @@ namespace Checkers.Hubs
             else
                 await Clients.Caller.SendAsync("realizeMovement", move, errorMessage);
         }
+        /*
+         * Sends info to players that game has started
+         */
         public async Task StartGame(int roomId)
         {
             Room room = GetRoom(roomId);
@@ -89,6 +100,9 @@ namespace Checkers.Hubs
             if (room.User1.UserName == "BOT")
                 await BotMovement(roomId);
         }
+        /*
+         * Sends info to players that one of them surrendered
+         */
         public async Task SurrenderGame(int roomId, string userId)
         {
             Room room = GetRoom(roomId);
@@ -129,6 +143,9 @@ namespace Checkers.Hubs
                 await Clients.Group(roomId.ToString()).SendAsync("refresh");
             }
         }
+        /*
+         * Sets up timer for room
+         */
         private void SetTimer(Room room)
         {
             aTimer.room = room;
@@ -138,6 +155,9 @@ namespace Checkers.Hubs
             aTimer.Interval = 1000;
             aTimer.Enabled = true;
         }
+        /*
+         * Removes one second from timer
+         */
         private async void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
             aTimer = (CustomTimer)source;
@@ -183,6 +203,9 @@ namespace Checkers.Hubs
             else
                 aTimer.Enabled = false;
         }
+        /*
+         * Sends message to users of the room
+         */
         public async Task SendMessage(string UserId, int? roomId)
         {
             string message = _context.Messages
@@ -192,6 +215,9 @@ namespace Checkers.Hubs
                   .MessageToDisplay();
             await Clients.Group(roomId.ToString()).SendAsync("receiveMessage", message);
         }
+        /*
+         * Prosesses move done by AI
+         */
         private async Task BotMovement(int roomId)
         {
             Room room = GetRoom(roomId);

@@ -18,6 +18,9 @@ namespace Checkers.Models
         public User User { get; set; } 
         public int? RoomId { get; set; }
         public Room Room { get; set; }
+        /*
+         * Returns message with posted time and username
+         */
         public string MessageToDisplay()
         {
             return $"[{Posted.ToShortTimeString()}] {UserName.Split('@')[0]}: {Text}";

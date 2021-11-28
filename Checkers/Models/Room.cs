@@ -27,8 +27,9 @@ namespace Checkers.Models
         public bool ActiveUser { get; set; }
         public bool IsActive { get; set; }
         public List<Message> Messages {get;set;}
-
-
+        /*
+         * Checks if player can legally make a move
+         */
         public string ValidatePlayer(string userId, Move move)
         {
             Field field = Board.GetField(move.StartX, move.StartY);
@@ -42,6 +43,9 @@ namespace Checkers.Models
                 return "This is enemy piece.";
             return "";
         }
+        /*
+         * Deactivetes the game
+         */
         public void gameOver()
         {
             IsActive = false;

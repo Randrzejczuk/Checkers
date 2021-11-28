@@ -28,6 +28,9 @@ namespace Checkers.Models
                 });
             }
         }
+        /*
+         * Initializes board
+         */
         public void Init()
         {
             LastMoved = null;
@@ -53,11 +56,17 @@ namespace Checkers.Models
                     field.State = State.Empty;
             }
         }
+        /*
+         * Returns field requested by its coordinates
+         */
         public Field GetField(int x, int y)
         {
             Field field = Fields.FirstOrDefault(f => f.X == x && f.Y == y);
             return field;
         }
+        /*
+         * Sets state of the board received in string form
+         */
         public void SetState(string state)
         {
             List<Field> ActiveFields = Fields
@@ -78,6 +87,9 @@ namespace Checkers.Models
                 };
             }
         }
+        /*
+         * Returns board as string
+         */
         public string GetState()
         {
             string result = string.Empty;
@@ -109,6 +121,9 @@ namespace Checkers.Models
             }
             return result;
         }
+        /*
+         *Validates requested move
+         */
         public string ValidateMove(Move move)
         {
             Field attacker = GetField(move.StartX, move.StartY);
@@ -135,6 +150,9 @@ namespace Checkers.Models
             }
             return "You have to attack enemy piece.";
         }
+        /*
+         * Realizes requested move
+         */
         public BoardState RecordMovement(Move move)
         {
             Field start = GetField(move.StartX, move.StartY);
@@ -152,6 +170,9 @@ namespace Checkers.Models
             LastMoved = target;
             return this;
         }
+        /*
+         * Returns winner if there are no avaiable moves for player
+         */
         public Color CheckWinner ()
         {
 
@@ -164,6 +185,9 @@ namespace Checkers.Models
                 return Color.White;
             return Color.None;
         }
+        /*
+         * Finds all avaiable moves for player
+         */
         private List<AiMove> GetAvailableMoves(Color color)
         {
             List<AiMove> validMoves = new List<AiMove>();
@@ -192,6 +216,10 @@ namespace Checkers.Models
             }
             return validMoves;
         }
+        /*
+         * Recursive function that predicts best next movements and returns the best currently avaiable
+         * depth sets how many recursions will occur
+         */
         public AiMove GetBestMove(bool isAiTurn, Color botColor, BoardState board, int depth)
         {
             List<AiMove> AvailableMoves;

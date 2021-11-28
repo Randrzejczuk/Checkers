@@ -24,6 +24,9 @@ namespace Checkers.Controllers
             _context = context;
             _userManager = userManager;
         }
+        /*
+         * Finds room in database by roomId, and returns it
+         */
         public Room GetRoom(int roomId)
         {
             Room room = _context.Rooms
@@ -39,6 +42,9 @@ namespace Checkers.Controllers
             else
                 throw new Exception($"Room whith Id {roomId} does not exist.");
         }
+        /*
+         * Returns view that lists all avaiable rooms
+         */
         [Authorize]
         public IActionResult List()
         {
@@ -47,14 +53,19 @@ namespace Checkers.Controllers
                 .Include(u => u.User2);
             return View(result);
         }
+        /*
+        * Redirects to view for room creation
+        */
         [ActionName("Create")]
         [ValidateAntiForgeryToken]
         [Authorize]
-
         public IActionResult Create()
         {
             return View();
         }
+        /*
+        * Creates new room and redirects to it
+        */
         [ActionName("Create room")]
         [ValidateAntiForgeryToken]
         [Authorize]
@@ -78,6 +89,9 @@ namespace Checkers.Controllers
             }
             return RedirectToAction("Room", new { roomId = room.Id });
         }
+        /*
+         * Redirects to room by roomId
+         */
         [Authorize]
         public IActionResult Room(int roomId)
         {
@@ -94,6 +108,9 @@ namespace Checkers.Controllers
                 return RedirectToAction("List");
             }
         }
+        /*
+         * Resets the board and begins game
+         */
         public async Task<IActionResult> StartButton(int roomId)
         {
             try
@@ -129,6 +146,9 @@ namespace Checkers.Controllers
                 return RedirectToAction("List");
             }
         }
+        /*
+         * Resets the board and begins game against AI
+         */
         public async Task<IActionResult> PlayWithBot(int roomId)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -153,6 +173,10 @@ namespace Checkers.Controllers
             _context.SaveChanges();
             return RedirectToAction("Room", new { roomId });
         }
+        /*
+         * If there is avaiable space adds allows user to join
+         * If last user leaves the room, deletes this room
+         */
         public async Task<IActionResult> JoinButton(int roomId, int buttonId)
         {
             try
@@ -179,9 +203,7 @@ namespace Checkers.Controllers
                         room.User1IsActive = false;
                         if (room.User2 == null || room.User2.UserName == "BOT")
                         {
-                            _context.Messages.RemoveRange(room.Messages);
-                            _context.Rooms.Remove(room);
-                            _context.SaveChanges();
+                            DeleteRoom(room);
                             return RedirectToAction("List");
                         }
                     }
@@ -206,8 +228,7 @@ namespace Checkers.Controllers
                         room.User2IsActive = false;
                         if (room.User1 == null || room.User1.UserName=="BOT")
                         {
-                            _context.Rooms.Remove(room);
-                            _context.SaveChanges();
+                            DeleteRoom(room);
                             return RedirectToAction("List");
                         }
                     }
@@ -220,6 +241,9 @@ namespace Checkers.Controllers
                 return RedirectToAction("List");
             }
         }
+        /*
+         * Adds message to databse
+         */
         [Authorize]
         public async Task<IActionResult> AddMessage(string userId, string text, int roomId)
         {
@@ -235,6 +259,9 @@ namespace Checkers.Controllers
                 await _context.SaveChangesAsync();
                 return Ok();
         }
+        /*
+         * If there is no bot player in databse creates it, otherwise gets it and returns it
+         */
         private User GetOrCreateBot()
         {
             User Bot = (User)_context.Users.Where(u => u.UserName == "BOT").FirstOrDefault();
@@ -247,6 +274,18 @@ namespace Checkers.Controllers
                 _context.SaveChangesAsync();
             }
             return Bot;
+        }
+        /*
+         * Removes room from database with all of its elements
+         */
+        private void DeleteRoom(Room room)
+        {
+            room.Board.LastMoved = null;
+            _context.Messages.RemoveRange(room.Messages);
+            _context.Field.RemoveRange(room.Board.Fields);
+            _context.BoardStates.Remove(room.Board);
+            _context.Rooms.Remove(room);
+            _context.SaveChanges();
         }
     }
 }

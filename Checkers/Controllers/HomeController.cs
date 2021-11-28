@@ -28,6 +28,9 @@ namespace Checkers.Controllers
             _context = context;
             _userManager = userManager;
         }
+        /*
+         * Returns view for main page
+         */
         [Authorize]
         public async Task<IActionResult> Index()
         {
@@ -45,6 +48,9 @@ namespace Checkers.Controllers
             return View(messages);
         }
         [Authorize]
+        /*
+         * Adds message to database
+         */
         public async Task<IActionResult> Create(Message message)
         {
             if(ModelState.IsValid)
@@ -59,7 +65,9 @@ namespace Checkers.Controllers
             }
             return Error();
         }
-
+        /*
+        * Returns error page
+        */
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

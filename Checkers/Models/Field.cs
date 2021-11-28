@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Checkers.Models
 {
@@ -26,6 +23,9 @@ namespace Checkers.Models
         public int X { get; set; }
         public int Y { get; set; }
         public State State { get; set; }
+        /*
+         * Changes piece to queen piece
+         */
         public void Promote()
         {
             switch (State)
@@ -38,6 +38,9 @@ namespace Checkers.Models
                     break;
             }
         }
+        /*
+         * Checks if selected piece can attack
+         */
         public bool CanAttack(BoardState board)
         {
             switch (State)
@@ -149,6 +152,9 @@ namespace Checkers.Models
             }
             return false; 
         }
+        /*
+         * Checks if selected piece can move
+         */
         public bool CanMove(BoardState board)
         {
             switch (State)
@@ -196,6 +202,9 @@ namespace Checkers.Models
             }
             return CanAttack(board);
         }
+        /*
+         * Returns color of selected piece
+         */
         public Color GetColor()
         {
             if (State == State.White || State == State.White_Q)
@@ -204,6 +213,9 @@ namespace Checkers.Models
                 return Color.Black;
             return Color.None;
         }
+        /*
+         * Returns list of avaiable attacks for selected piece
+         */
         public List<AiMove> GetAttacks(BoardState board)
         {
             List<AiMove> moves = new List<AiMove>();
@@ -310,7 +322,9 @@ namespace Checkers.Models
             }
             return moves;
         }
-
+        /*
+         * Returns list of avaiable moves for selected piece
+         */
         public List<AiMove> GetMoves(BoardState board)
         {
             List<AiMove> moves = new List<AiMove>();

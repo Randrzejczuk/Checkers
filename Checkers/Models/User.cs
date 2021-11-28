@@ -13,6 +13,9 @@ namespace Checkers.Models
             Messages = new HashSet<Message>();
         }
         public ICollection<Message> Messages { get; set; }
+        /*
+         * Returns user name not as an email
+         */
         public string ShortName()
         {
             return this.UserName.Split('@')[0];
