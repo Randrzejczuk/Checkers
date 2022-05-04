@@ -32,7 +32,7 @@ namespace Checkers.Models
          */
         public string ValidatePlayer(string userId, Move move)
         {
-            Field field = Board.GetField(move.StartX, move.StartY);
+            Field field = Board[move.StartX, move.StartY];
             if (userId != User1Id && userId != User2Id)
                 return "You are not a player in this game.";
             else if (!IsActive)

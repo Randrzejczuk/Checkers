@@ -12,6 +12,10 @@ namespace Checkers.Models
         public int Id { get; set; }
         public List<Field> Fields { get; set; }
         public Field LastMoved { get; set; }
+        public Field this[int x,int y]
+        {
+            get => Fields.Find(f => f.X == x && f.Y == y);
+        }
         public BoardState()
         {
         }
@@ -55,14 +59,6 @@ namespace Checkers.Models
                 else
                     field.State = State.Empty;
             }
-        }
-        /*
-         * Returns field requested by its coordinates
-         */
-        public Field GetField(int x, int y)
-        {
-            Field field = Fields.FirstOrDefault(f => f.X == x && f.Y == y);
-            return field;
         }
         /*
          * Sets state of the board received in string form
@@ -126,7 +122,7 @@ namespace Checkers.Models
          */
         public string ValidateMove(Move move)
         {
-            Field attacker = GetField(move.StartX, move.StartY);
+            Field attacker = this[move.StartX, move.StartY];
             if (LastMoved != null && attacker.GetColor() == LastMoved.GetColor())
             {
                 if (attacker != LastMoved)
@@ -155,8 +151,8 @@ namespace Checkers.Models
          */
         public BoardState RecordMovement(Move move)
         {
-            Field start = GetField(move.StartX, move.StartY);
-            Field target = GetField(move.TargetX, move.TargetY);
+            Field start = this[move.StartX, move.StartY];
+            Field target = this[move.TargetX, move.TargetY];
             target.State = start.State;
             start.State = State.Empty;
             if ((target.Y == 8 && target.State == State.Black)|| (target.Y == 1 && target.State == State.White))
@@ -164,7 +160,7 @@ namespace Checkers.Models
 
             if (move.DestroyX != null)
             {
-                Field destroy = GetField((int)move.DestroyX, (int)move.DestroyY);
+                Field destroy = this[(int)move.DestroyX, (int)move.DestroyY];
                 destroy.State = State.Empty;
             }
             LastMoved = target;
@@ -238,7 +234,7 @@ namespace Checkers.Models
                 {
                     BoardState afterMove = new BoardState(board);
                     afterMove = afterMove.RecordMovement(move);
-                    Field target = afterMove.GetField(move.TargetX, move.TargetY);
+                    Field target = afterMove[move.TargetX, move.TargetY];
                     if (move.DestroyX != null && target.CanAttack(afterMove))
                         move.Score++;
                 }
@@ -251,7 +247,7 @@ namespace Checkers.Models
                 {
                     BoardState afterMove = new BoardState(board);
                     afterMove = afterMove.RecordMovement(move);
-                    Field target = afterMove.GetField(move.TargetX, move.TargetY);
+                    Field target = afterMove[move.TargetX, move.TargetY];
                     if (move.DestroyX != null && target.CanAttack(afterMove))
                     {
                         move.Score++;

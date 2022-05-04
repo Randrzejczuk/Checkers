@@ -280,7 +280,8 @@ namespace Checkers.Controllers
          */
         private void DeleteRoom(Room room)
         {
-            room.Board.LastMoved = null;
+            _context.BoardStates.FirstOrDefault(m => m.Id == room.Board.Id).LastMoved = null;
+            _context.SaveChanges();
             _context.Messages.RemoveRange(room.Messages);
             _context.Field.RemoveRange(room.Board.Fields);
             _context.BoardStates.Remove(room.Board);

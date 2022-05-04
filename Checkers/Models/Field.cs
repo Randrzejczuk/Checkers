@@ -56,12 +56,12 @@ namespace Checkers.Models
                 {
                     if ( X < 7)
                     {
-                        var field = board.GetField(X + 1, Y + 1);
+                        var field = board[X + 1, Y + 1];
                         if (State == State.White_Q)
                         {
                             if (field.GetColor() == Color.Black)
                             {
-                                field = board.GetField(X + 2, Y + 2);
+                                field = board[X + 2, Y + 2];
                                 if (field.State == State.Empty)
                                     return true;
                             }
@@ -70,7 +70,7 @@ namespace Checkers.Models
                         {
                             if (field.GetColor() == Color.White)
                             {
-                                field = board.GetField(X + 2, Y + 2);
+                                field = board[X + 2, Y + 2];
                                 if (field.State == State.Empty)
                                     return true;
                             }
@@ -78,12 +78,12 @@ namespace Checkers.Models
                     }
                     if (X > 2)
                     {
-                        var field = board.GetField(X - 1, Y + 1);
+                        var field = board[X - 1, Y + 1];
                         if (State == State.White_Q)
                         {
                             if (field.GetColor() == Color.Black)
                             {
-                                field = board.GetField(X - 2, Y + 2);
+                                field = board[X - 2, Y + 2];
                                 if (field.State == State.Empty)
                                     return true;
                             }
@@ -92,7 +92,7 @@ namespace Checkers.Models
                         {
                             if (field.GetColor() == Color.White)
                             {
-                                field = board.GetField(X - 2, Y + 2);
+                                field = board[X - 2, Y + 2];
                                 if (field.State == State.Empty)
                                     return true;
                             }
@@ -106,12 +106,12 @@ namespace Checkers.Models
                 {
                     if (X < 7)
                     {
-                        var field = board.GetField(X + 1, Y - 1);
+                        var field = board[X + 1, Y - 1];
                         if (State == State.Black_Q)
                         {
                             if (field.GetColor() == Color.White)
                             {
-                                field = board.GetField(X + 2, Y - 2);
+                                field = board[X + 2, Y - 2];
                                 if (field.State == State.Empty)
                                     return true;
                             }
@@ -120,7 +120,7 @@ namespace Checkers.Models
                         {
                             if (field.GetColor() == Color.Black)
                             {
-                                field = board.GetField(X + 2, Y - 2);
+                                field = board[X + 2, Y - 2];
                                 if (field.State == State.Empty)
                                     return true;
                             }
@@ -128,12 +128,12 @@ namespace Checkers.Models
                     }
                     if (X > 2)
                     {
-                        var field = board.GetField(X - 1, Y - 1);
+                        var field = board[X - 1, Y - 1];
                         if (State == State.Black_Q)
                         {
                             if (field.GetColor() == Color.White)
                             {
-                                field = board.GetField(X - 2, Y - 2);
+                                field = board[X - 2, Y - 2];
                                 if (field.State == State.Empty)
                                     return true;
                             }
@@ -142,7 +142,7 @@ namespace Checkers.Models
                         {
                             if (field.GetColor() == Color.Black)
                             {
-                                field = board.GetField(X - 2, Y - 2);
+                                field = board[X - 2, Y - 2];
                                 if (field.State == State.Empty)
                                     return true;
                             }
@@ -170,13 +170,13 @@ namespace Checkers.Models
                 {
                     if (X != 1)
                     {
-                        Field field = board.GetField(X - 1, Y + 1);
+                        Field field = board[X - 1, Y + 1];
                         if (field.State == State.Empty)
                             return true;
                     }
                     if (X != 8)
                     {
-                        Field field = board.GetField(X + 1, Y + 1);
+                        Field field = board[X + 1, Y + 1];
                         if (field.State == State.Empty)
                             return true;
                     }
@@ -188,13 +188,13 @@ namespace Checkers.Models
                 {
                     if (X != 1)
                     {
-                        Field field = board.GetField(X - 1, Y - 1);
+                        Field field = board[X - 1, Y - 1];
                         if (field.State == State.Empty)
                             return true;
                     }
                     if (X != 8)
                     {
-                        Field field = board.GetField(X + 1, Y - 1);
+                        Field field = board[X + 1, Y - 1];
                         if (field.State == State.Empty)
                             return true;
                     }
@@ -225,10 +225,10 @@ namespace Checkers.Models
                 {
                     if (X < 7)
                     {
-                        Field NextField = board.GetField(X + 1, Y + 1);
+                        Field NextField = board[X + 1, Y + 1];
                         if (NextField.GetColor() != Color.None && NextField.GetColor() != this.GetColor())
                         {
-                            Field TargetField = board.GetField(X + 2, Y + 2);
+                            Field TargetField = board[X + 2, Y + 2];
                             if (TargetField.GetColor() == Color.None)
                             {
                                 moves.Add(new AiMove()
@@ -247,10 +247,10 @@ namespace Checkers.Models
                     }
                     if (X > 2)
                     {
-                        Field NextField = board.GetField(X - 1, Y + 1);
+                        Field NextField = board[X - 1, Y + 1];
                         if (NextField.GetColor() != Color.None && NextField.GetColor() != this.GetColor())
                         {
-                            Field TargetField = board.GetField(X - 2, Y + 2);
+                            Field TargetField = board[X - 2, Y + 2];
                             if (TargetField.GetColor() == Color.None)
                             {
                                 moves.Add(new AiMove()
@@ -275,10 +275,10 @@ namespace Checkers.Models
                 {
                     if (X < 7)
                     {
-                        Field NextField = board.GetField(X + 1, Y - 1);
+                        Field NextField = board[X + 1, Y - 1];
                         if (NextField.GetColor() != Color.None && NextField.GetColor() != this.GetColor())
                         {
-                            Field TargetField = board.GetField(X + 2, Y - 2);
+                            Field TargetField = board[X + 2, Y - 2];
                             if (TargetField.GetColor() == Color.None)
                             {
                                 moves.Add(new AiMove()
@@ -298,10 +298,10 @@ namespace Checkers.Models
                     }
                     if (X > 2)
                     {
-                        Field NextField = board.GetField(X - 1, Y - 1);
+                        Field NextField = board[X - 1, Y - 1];
                         if (NextField.GetColor() != Color.None && NextField.GetColor() != this.GetColor())
                         {
-                            Field TargetField = board.GetField(X - 2, Y - 2);
+                            Field TargetField = board[X - 2, Y - 2];
                             if (TargetField.GetColor() == Color.None)
                             {
                                 moves.Add(new AiMove()
@@ -334,7 +334,7 @@ namespace Checkers.Models
                 {
                     if (X < 8)
                     {
-                        Field TargetField = board.GetField(X + 1, Y + 1);
+                        Field TargetField = board[X + 1, Y + 1];
                         if (TargetField.GetColor() == Color.None)
                         {
                             moves.Add(new AiMove()
@@ -350,7 +350,7 @@ namespace Checkers.Models
                     }
                     if (X > 1)
                     {
-                        Field TargetField = board.GetField(X - 1, Y + 1);
+                        Field TargetField = board[X - 1, Y + 1];
                         if (TargetField.GetColor() == Color.None)
                         {
                             moves.Add(new AiMove()
@@ -372,7 +372,7 @@ namespace Checkers.Models
                 {
                     if (X < 8)
                     {
-                        Field TargetField = board.GetField(X + 1, Y - 1);
+                        Field TargetField = board[X + 1, Y - 1];
                         if (TargetField.GetColor() == Color.None)
                         {
                             moves.Add(new AiMove()
@@ -388,7 +388,7 @@ namespace Checkers.Models
                     }
                     if (X > 1)
                     {
-                        Field TargetField = board.GetField(X - 1, Y - 1);
+                        Field TargetField = board[X - 1, Y - 1];
                         if (TargetField.GetColor() == Color.None)
                         {
                             moves.Add(new AiMove()

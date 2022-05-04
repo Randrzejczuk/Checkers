@@ -56,7 +56,7 @@ namespace Checkers.Hubs
                 room.Board.RecordMovement(move);
                 if (Math.Abs(move.TargetX - move.StartX) == 2)
                 {
-                    Field field = room.Board.GetField(move.TargetX, move.TargetY);
+                    Field field = room.Board[move.TargetX, move.TargetY];
                     if (!field.CanAttack(room.Board))
                         room.ActiveUser = !room.ActiveUser;
                 }

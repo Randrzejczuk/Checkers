@@ -13,7 +13,7 @@
                 <tr>
                     @for (int x = (ViewBag.currentUserId == Model.User2Id ? 8 : 1); x != (ViewBag.currentUserId == Model.User2Id ? 0 : 9); x = (ViewBag.currentUserId == Model.User2Id ? x - 1 : x + 1))
                     {
-                        Field field = Model.Board.GetField(x, y);
+                        Field field = Model.Board[x, y];
                         switch (field.State)
                         {
                             case State.Unused:
